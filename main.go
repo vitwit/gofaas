@@ -2,9 +2,8 @@ package main
 
 import (
 	"github.com/kataras/golog"
-	"github.com/vitwit/go-fass/openfass-go/models"
 	"github.com/vitwit/go-fass/openfass-go"
-)
+	)
 
 func main() {
 	cli := openfass_go.NewSendClient("admin", "9a651783248f8b61a92ae2fa02c7cb627a68e061f5cc0773822f72e0c7af077d",
@@ -20,12 +19,12 @@ func main() {
 
 	golog.Info("response og get system...........", res)
 
-	data := models.FunctionDefintion{
+	data := openfass_go.FunctionDefintion{
 		Service:    "nodeinfo123",
 		Network:    "func_functions",
 		Image:      "functions/nodeinfo:latest",
 		EnvProcess: "node main.js",
-		EnvVars: models.EnvVars{
+		EnvVars: openfass_go.EnvVars{
 			AdditionalProp1: "string",
 			AdditionalProp2: "string",
 			AdditionalProp3: "string",
@@ -36,16 +35,16 @@ func main() {
 		Labels: map[string]string{
 			"example": "func1",
 		},
-		Annotations: models.Annotations{
+		Annotations: openfass_go.Annotations{
 			Topics: "awesome-kafka-topic",
 			Foo:    "some",
 		},
 		RegistryAuth: "dXNlcjpwYXNzd29yZA==",
-		Limits: models.Limits{
+		Limits: openfass_go.Limits{
 			Memory: "128M",
 			CPU:    "0.01",
 		},
-		Requests: models.Requests{
+		Requests: openfass_go.Requests{
 			Memory: "128M",
 			CPU:    "0.01",
 		},
@@ -59,10 +58,13 @@ func main() {
 
 	golog.Info("response of create system....", clires)
 
-	dd := map[string]string{
+	dd := map[string]interface{}{
 		"receiver": "scale-up",
 		"status": "firing",
-		"alertName":"check",
+		"check":map[string]string{
+			"nested":"true",
+		},
+
 	}
 
 	rr, _ := cli.SystemAlert(dd)

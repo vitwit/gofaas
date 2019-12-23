@@ -41,7 +41,7 @@ func (cl *Client) DeleteSystemFunction(data DeleteFunctionRequest) (*rest.Respon
 }
 
 // System alert
-func (cl *Client) SystemAlert(data SystemAlert) (*rest.Response, error) {
+func (cl *Client) SystemAlert(data map[string]interface{}) (*rest.Response, error) {
 	request := GetRequestObject(cl, "POST", host+"/system/alert")
 	b := GetByteData(data)
 	request.Body = b
