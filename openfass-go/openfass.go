@@ -5,16 +5,7 @@ import (
 	"github.com/vitwit/go-fass/rest"
 )
 
-// Version is this client library's current version
-const (
-	Version        = "3.1.0"
-	rateLimitRetry = 5
-	rateLimitSleep = 1100
-	user           = "admin"
-	password       = "9a651783248f8b61a92ae2fa02c7cb627a68e061f5cc0773822f72e0c7af077d"
-)
-
-// Client is the Twilio SendGrid Go client
+// client
 type Client struct {
 	// rest.Request
 	rest.Request
@@ -32,7 +23,7 @@ func (o *options) baseURL() string {
 	return o.Host + o.Endpoint
 }
 
-func GetRequestObject(cli *Client,method rest.Method, baseUrl string) rest.Request {
+func GetRequestObject(cli *Client, method rest.Method, baseUrl string) rest.Request {
 	cli.Method = method
 	cli.BaseURL = baseUrl
 
@@ -56,7 +47,6 @@ func requestNew(options options) rest.Request {
 	encode := base64.StdEncoding.EncodeToString([]byte(userAndPassword))
 
 	requestHeaders := map[string]string{
-		//"Authorization": "Basic YWRtaW46OWE2NTE3ODMyNDhmOGI2MWE5MmFlMmZhMDJjN2NiNjI3YTY4ZTA2MWY1Y2MwNzczODIyZjcyZTBjN2FmMDc3ZA==",
 		"Accept":        "application/json",
 		"Authorization": "Basic " + encode,
 	}

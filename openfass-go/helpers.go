@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// GetRequestBody of function defincation...
+// GetRequestBody of function defincation
 func GetRequestBody(data FunctionDefintion) []byte {
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -14,7 +14,7 @@ func GetRequestBody(data FunctionDefintion) []byte {
 	return b
 }
 
-func GetByteData(data interface{}) ([]byte){
+func GetByteData(data interface{}) []byte {
 	b, err := json.Marshal(data)
 	if err != nil {
 		log.Println(err)
