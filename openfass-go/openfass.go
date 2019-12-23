@@ -1,8 +1,8 @@
 package openfass_go
 
 import (
-"encoding/base64"
-"github.com/vitwit/go-fass/rest"
+	"encoding/base64"
+	"github.com/vitwit/go-fass/rest"
 )
 
 // Version is this client library's current version
@@ -30,6 +30,13 @@ type options struct {
 
 func (o *options) baseURL() string {
 	return o.Host + o.Endpoint
+}
+
+func GetRequestObject(cli *Client,method rest.Method, baseUrl string) rest.Request {
+	cli.Method = method
+	cli.BaseURL = baseUrl
+
+	return cli.Request
 }
 
 // GetRequest

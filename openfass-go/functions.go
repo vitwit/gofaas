@@ -3,28 +3,25 @@ package openfass_go
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"github.com/vitwit/go-fass/rest"
-
+	"log"
 )
 
 const host = "http://127.0.0.1:8080"
 
 // Create a system function
 func (cl *Client) CreateSystemFunctions(data FunctionDefintion) (*rest.Response, error) {
-	//request := GetRequest("/system/functions", "", user, password)
-	cl.Method = "POST"
-	cl.BaseURL = host + "/system/functions"
-	cl.Body = GetRequestBody(data)
-	return MakeRequest(cl.Request)
+	request := GetRequestObject(cl,"POST", host+"/system/functions")
+	request.Body = GetRequestBody(data)
+
+	return MakeRequest(request)
 }
 
 // Get system functions
 func (cl *Client) GetSystemFunctions(user, password string) (*rest.Response, error) {
-	//request := GetRequest("/system/functions", "", user, password)
-	cl.Method = "GET"
-	cl.BaseURL = host + "/system/functions"
-	return MakeRequest(cl.Request)
+	request := GetRequestObject(cl,"GET", host+"/system/functions")
+
+	return MakeRequest(request)
 }
 
 // Get system functions
