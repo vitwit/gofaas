@@ -13,3 +13,11 @@ func GetRequestBody(data FunctionDefintion) []byte {
 	}
 	return b
 }
+
+func GetByteData(data interface{}) ([]byte){
+	b, err := json.Marshal(data)
+	if err != nil {
+		log.Println(err)
+	}
+	return b
+}
