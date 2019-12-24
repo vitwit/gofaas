@@ -47,7 +47,7 @@ func (cl *Client) SystemAlert(data map[string]interface{}) (*rest.Response, erro
 	return MakeRequest(request)
 }
 
-//Invoke a function asynchronously in OpenFaaS
+// Invoke a function asynchronously in OpenFaaS
 func (cl *Client) AsyncFunction(data map[string]string, functionName string) (*rest.Response, error) {
 	endPoint := fmt.Sprintf("/async-function/%s", functionName)
 	request := GetRequestObject(cl, http.MethodPost, endPoint)

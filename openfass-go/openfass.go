@@ -66,6 +66,7 @@ func MakeRequest(request rest.Request) (*rest.Response, error) {
 
 }
 
+// Create a client for openFass
 func NewClient(user, password, endpoint string) *Client {
 	request := GetRequest(endpoint, "", user, password)
 	return &Client{request}

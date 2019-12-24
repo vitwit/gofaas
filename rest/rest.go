@@ -53,7 +53,7 @@ type Client struct {
 type Response struct {
 	StatusCode int                 // e.g. 200
 	Body       string              // e.g. {"result: success"}
-	Headers    map[string][]string // e.g. map[X-Ratelimit-Limit:[600]]
+	Headers    map[string][]string // e.g. Authorization:"Basic bjkhhjkl"
 }
 
 // AddQueryParameters adds query parameters to the URL.
@@ -112,9 +112,6 @@ func API(request Request) (*Response, error) {
 func Send(request Request) (*Response, error) {
 	return DefaultClient.Send(request)
 }
-
-// The following functions enable the ability to define a
-// custom HTTP Client
 
 // MakeRequest makes the API call.
 func (c *Client) MakeRequest(req *http.Request) (*http.Response, error) {

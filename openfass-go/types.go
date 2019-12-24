@@ -10,7 +10,7 @@ type FunctionListEntry []struct {
 	AvailableReplicas int64             `json:"availableReplicas"`
 	EnvProcess        string            `json:"envProcess"`
 	Labels            map[string]string `json:"labels"`
-	Annotations       Annotations       `json:"annotations"`
+	Annotations       map[string]string `json:"annotations"`
 }
 
 type Annotations struct {
