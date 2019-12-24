@@ -4,11 +4,10 @@ import (
 	"encoding/base64"
 	"github.com/vitwit/go-fass/rest"
 	"os"
-	)
+)
 
 // client
 type Client struct {
-	// rest.Request
 	rest.Request
 }
 
@@ -61,7 +60,6 @@ var DefaultClient = rest.DefaultClient
 func API(request rest.Request) (*rest.Response, error) {
 	return MakeRequest(request)
 }
-
 
 func MakeRequest(request rest.Request) (*rest.Response, error) {
 	return DefaultClient.Send(request)
