@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"github.com/vitwit/go-fass/rest"
 	"os"
-)
+	)
 
 // client
 type Client struct {
@@ -26,7 +26,7 @@ func (o *options) baseURL() string {
 
 func GetRequestObject(cli *Client, method rest.Method, endPoint string) rest.Request {
 	cli.Method = method
-	cli.BaseURL = os.Getenv("hostUrl") + endPoint
+	cli.BaseURL = os.Getenv("HOST_URL") + endPoint
 
 	return cli.Request
 }
@@ -34,28 +34,25 @@ func GetRequestObject(cli *Client, method rest.Method, endPoint string) rest.Req
 // GetRequest
 // @return [Request] a default request object
 func GetRequest(endpoint, host, user, password string) rest.Request {
-	return requestNew(options{endpoint, host, user, password})
-}
+	var options options
 
-// requestNew create Request
-// @return [Request] a default request object
-func requestNew(options options) rest.Request {
-	if options.Host == "" {
-		options.Host = "http://127.0.0.1:8080"
+	if host == "" {
+		options.Host = os.Getenv("HOST_URL")
 	}
 
-	userAndPassword := options.User + ":" + options.Password
-	encode := base64.StdEncoding.EncodeToString([]byte(userAndPassword))
+	userAndPassword := user + ":" + password
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(userAndPassword))
 
 	requestHeaders := map[string]string{
 		"Accept":        "application/json",
-		"Authorization": "Basic " + encode,
+		"Authorization": "Basic " + encodedAuth,
 	}
 
 	return rest.Request{
 		BaseURL: options.baseURL(),
 		Headers: requestHeaders,
 	}
+
 }
 
 // DefaultClient is used if no custom HTTP client is defined
@@ -65,15 +62,13 @@ func API(request rest.Request) (*rest.Response, error) {
 	return MakeRequest(request)
 }
 
-// MakeRequest attempts a Twilio SendGrid request synchronously.
+
 func MakeRequest(request rest.Request) (*rest.Response, error) {
 	return DefaultClient.Send(request)
 
 }
 
-// NewSendClient constructs a new Twilio SendGrid client given an API key
-func NewSendClient(user, password, endpoint string) *Client {
+func NewClient(user, password, endpoint string) *Client {
 	request := GetRequest(endpoint, "", user, password)
-	//request.Method = "POST"
 	return &Client{request}
 }

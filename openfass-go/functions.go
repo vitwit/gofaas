@@ -22,7 +22,7 @@ func (cl *Client) CreateSystemFunctions(data FunctionDefintion) (*rest.Response,
 }
 
 // Get system functions
-func (cl *Client) GetSystemFunctions(user, password string) (*rest.Response, error) {
+func (cl *Client) GetSystemFunctions() (*rest.Response, error) {
 	request := GetRequestObject(cl, Get, "/system/functions")
 
 	return MakeRequest(request)
@@ -95,6 +95,7 @@ func (cl *Client) ScaleFunction(data map[string]string, functionName string) (*r
 }
 
 //Get a summary of an OpenFaaS function
+
 func (cl *Client) GetFunctionSummary(data map[string]string, functionName string) (*rest.Response, error) {
 	s := fmt.Sprintf("/system/function/%s", functionName)
 	request := GetRequestObject(cl, Get, s)
