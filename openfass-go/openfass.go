@@ -3,6 +3,7 @@ package openfass_go
 import (
 	"encoding/base64"
 	"github.com/vitwit/go-fass/rest"
+	"os"
 )
 
 // client
@@ -23,9 +24,9 @@ func (o *options) baseURL() string {
 	return o.Host + o.Endpoint
 }
 
-func GetRequestObject(cli *Client, method rest.Method, baseUrl string) rest.Request {
+func GetRequestObject(cli *Client, method rest.Method, endPoint string) rest.Request {
 	cli.Method = method
-	cli.BaseURL = baseUrl
+	cli.BaseURL = os.Getenv("hostUrl") + endPoint
 
 	return cli.Request
 }
