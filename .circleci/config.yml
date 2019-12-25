@@ -67,43 +67,43 @@ jobs:
           keys:
             - go-mod-v2-{{ checksum "go.sum" }}
       - run:
+          name: "Create a temp directory for artifacts"
+          command: |
+            mkdir -p /tmp/logs /tmp/workspace/profiles
+      - run:
           name: Run tests
           command: |
-            export VERSION="$(git describe --tags --long | sed 's/v\(.*\)/\1/')"
-            export GO111MODULE=on
-            mkdir -p /tmp/logs /tmp/workspace/profiles
-            for pkg in $(go list ./... | grep -v '/simulation' | circleci tests split); do
-              id=$(echo "$pkg" | sed 's|[/.]|_|g')
-              go test -mod=readonly -timeout 8m -race -coverprofile=/tmp/workspace/profiles/$id.out -covermode=atomic "$pkg" | tee "/tmp/logs/$id-$RANDOM.log"
-            done
+            go test -coverprofile=c.out
+            go tool cover -html=c.out -o coverage.html
+            mv coverage.html /tmp/artifacts
       - persist_to_workspace:
-          root: /tmp/workspace
+          root: /tmp/artifacts
           paths:
-            - "profiles/*"
+            - "./"
       - store_artifacts:
-          path: /tmp/logs
+          path: /tmp/artifacts
 
   upload-coverage:
     executor: golang
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: /tmp/artifacts
       - checkout
       - run:
           name: gather
           command: |
             echo "--> Concatenating profiles:"
-            ls /tmp/workspace/profiles/
+            ls /tmp/artifacts/
             echo "mode: atomic" > coverage.txt
-            for prof in $(ls /tmp/workspace/profiles/); do
-              tail -n +2 /tmp/workspace/profiles/"$prof" >> coverage.txt
+            for prof in $(ls /tmp/artifacts); do
+              tail -n +2 /tmp/artifacts/"$prof" >> coverage.txt
             done
       - run:
           name: filter out DONTCOVER
           command: |
             excludelist="$(find ./ -type f -name '*.go' | xargs grep -l 'DONTCOVER')"
             for filename in ${excludelist}; do
-              filename=$(echo $filename | sed 's/^./github.com\/cosmos\/cosmos-sdk/g')
+              filename=$(echo $filename | sed 's/^./github.com\/vitwit\/go-fass/g')
               echo "Excluding ${filename} from coverage report..."
               sed -i.bak "/$(echo $filename | sed 's/\//\\\//g')/d" coverage.txt
             done
