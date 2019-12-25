@@ -30,6 +30,14 @@ commands:
             make << parameters.target >>
 
 jobs:
+  build-docs:
+    executor: docs
+    steps:
+      - checkout
+      - run:
+          name: "Build docs"
+          command: make build-docs
+
   setup-dependencies:
     executor: golang
     steps:
@@ -137,3 +145,18 @@ workflows:
       - upload-coverage:
           requires:
             - test-cover
+      - build-docs:
+          context: docs-deployment-master
+          filters:
+            branches:
+              only:
+                - docs-theme-latest
+      - build-docs:
+          context: docs-deployment-release
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only:
+                - /v.*/
