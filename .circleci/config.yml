@@ -69,7 +69,7 @@ jobs:
       - run:
           name: "Create a temp directory for artifacts"
           command: |
-            mkdir -p /tmp/logs /tmp/workspace/profiles
+            mkdir -p /tmp/logs /tmp/artifacts
       - run:
           name: Run tests
           command: |
