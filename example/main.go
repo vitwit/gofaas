@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/kataras/golog"
-	"github.com/vitwit/go-fass/openfass-go"
+	fass "github.com/vitwit/go-fass"
 	"os"
 )
 
 func main() {
-	cli := openfass_go.NewClient(os.Getenv("USER"), os.Getenv("PASSWORD"),
+	cli := fass.NewClient(os.Getenv("USER"), os.Getenv("PASSWORD"),
 		"")
 
 	golog.Info("host: ", cli.BaseURL)
@@ -20,12 +20,12 @@ func main() {
 
 	golog.Info("response of get system:  ", res)
 
-	data := openfass_go.FunctionDefintion{
-		Service:    "nodeinfo123",
+	data := fass.FunctionDefintion{
+		Service:    "nodeinfo12345",
 		Network:    "func_functions",
 		Image:      "functions/nodeinfo:latest",
 		EnvProcess: "node main.js",
-		EnvVars: openfass_go.EnvVars{
+		EnvVars: fass.EnvVars{
 			AdditionalProp1: "string",
 			AdditionalProp2: "string",
 			AdditionalProp3: "string",
@@ -36,16 +36,16 @@ func main() {
 		Labels: map[string]string{
 			"example": "func1",
 		},
-		Annotations: openfass_go.Annotations{
+		Annotations: fass.Annotations{
 			Topics: "awesome-kafka-topic",
 			Foo:    "some",
 		},
 		RegistryAuth: "dXNlcjpwYXNzd29yZA==",
-		Limits: openfass_go.Limits{
+		Limits: fass.Limits{
 			Memory: "128M",
 			CPU:    "0.01",
 		},
-		Requests: openfass_go.Requests{
+		Requests: fass.Requests{
 			Memory: "128M",
 			CPU:    "0.01",
 		},

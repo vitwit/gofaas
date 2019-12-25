@@ -1,4 +1,4 @@
-package openfass_go
+package go_fass
 
 import (
 	"encoding/json"
