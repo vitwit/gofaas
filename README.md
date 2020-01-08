@@ -1,6 +1,7 @@
 
 # go-fass
-Go SDK for OpenFaaS(WIP)
+Go SDK for OpenFaaS
+This documentation is under (WIP)
 
 **This library allows you to quickly and easily use the openFasS API**
 
