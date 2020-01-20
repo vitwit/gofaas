@@ -2,6 +2,7 @@ package go_fass
 
 import (
 	"encoding/base64"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -21,7 +22,9 @@ func getGatewayAddress(gateway string) string {
 		addr = gateway
 	}
 	// remove leading slash if any
-	if string(addr[len(addr)-1]) == "/" {
+	fmt.Println(addr)
+	fmt.Println(len(addr))
+	if addr[len(addr)-1:] == "/" {
 		addr = strings.TrimRight(addr, "/")
 	}
 	return addr

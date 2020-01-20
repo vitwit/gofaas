@@ -3,24 +3,23 @@ package main
 import (
 	"github.com/kataras/golog"
 	fass "github.com/vitwit/go-fass"
-	"os"
 )
 
 func main() {
 	cli := fass.NewClient(&fass.FaasGatewayCredentials{
-		Username:       os.Getenv("USER"),
-		Password:       os.Getenv("PASSWORD"),
-		GatewayAddress: "",
+		Username:       "admin",
+		Password:       "fefa62476a1af8850cb3e3de481ab8a8aac84209a5c0e900bcc7ba0fd8fa149d",
+		GatewayAddress: "http://127.0.0.1:8080",
 	})
 
-	golog.Info("host: ", cli.URL)
+	golog.Info("HOST: ", cli.URL)
 
 	res, err := cli.GetSystemFunctions()
 	if err != nil {
 		golog.Error("Error from system functions:  ", err)
 	}
 
-	golog.Info("response of get sytem:  ", res)
+	golog.Info("response of get system:  ", res.Body)
 
 	data := fass.FunctionDefintion{
 		Service:    "nodeinfo12345",
@@ -74,5 +73,4 @@ func main() {
 		golog.Error("Error while getting alert info: ", err)
 	}
 	golog.Info("alert info: ", alertInfo)
-
 }
