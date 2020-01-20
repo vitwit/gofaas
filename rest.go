@@ -33,9 +33,9 @@ func (cl *OpenFaasClient) BuildHTTPRequest(request *FaasRequestDefinition) (*htt
 	}
 
 	// make new request
-	req, err := http.NewRequest(string(request.Method), request.URL, bytes.NewBuffer(request.Body))
+	req, err := http.NewRequest(request.Method, request.URL, bytes.NewBuffer(request.Body))
 	if err != nil {
-		return req, err
+		return nil, err
 	}
 
 	// set headers
@@ -48,7 +48,7 @@ func (cl *OpenFaasClient) BuildHTTPRequest(request *FaasRequestDefinition) (*htt
 	}
 
 	// return
-	return req, err
+	return req, nil
 }
 
 // BuildResponse builds the response struct.
