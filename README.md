@@ -36,9 +36,9 @@ Update HOST_URL, USER and PASSWORD
 Update the development environment with your keys, for example:
 
 ```bash
-"export HOST_URL='openFasS URL'"
-"export USER=''"
-"export PASSWORD=''"
+"export OPENFAAS_HOST_URL='openFasS URL'"
+"export OPENFAAS_USER=''"
+"export OPENFAAS_PASSWORD=''"
 
 ```
 <a name="quick-start"></a>
@@ -49,7 +49,7 @@ Update the development environment with your keys, for example:
 ```
 	import fass "go get github.com/vitwit/go-fass";
 
-    client := fass.NewClient(os.Getenv("USER"), os.Getenv("PASSWORD"),"")
+    client := fass.NewClient(os.Getenv("OPENFAAS_USER"), os.Getenv("OPENFAAS_PASSWORD"),"")
 ```
 
 <details>

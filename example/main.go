@@ -1,15 +1,17 @@
 package main
 
 import (
+	"os"
+
 	"github.com/kataras/golog"
 	fass "github.com/vitwit/go-fass"
 )
 
 func main() {
 	cli := fass.NewClient(&fass.FaasGatewayCredentials{
-		Username:       "admin",
-		Password:       "fefa62476a1af8850cb3e3de481ab8a8aac84209a5c0e900bcc7ba0fd8fa149d",
-		GatewayAddress: "http://127.0.0.1:8080",
+		Username:       os.Getenv("OPENFAAS_USERNAME"),
+		Password:       os.Getenv("OPENFAAS_PASSWORD"),
+		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"), // example: http://127.0.0.1:8080
 	})
 
 	golog.Info("HOST: ", cli.URL)

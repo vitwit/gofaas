@@ -17,7 +17,7 @@ func GetRequestDefinition(cli *OpenFaasClient, method, path string) *FaasRequest
 func getGatewayAddress(gateway string) string {
 	var addr string
 	if gateway == "" {
-		addr = os.Getenv("HOST_URL")
+		addr = os.Getenv("OPENFAAS_GATEWAY_ADDR")
 	} else {
 		addr = gateway
 	}
