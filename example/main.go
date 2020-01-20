@@ -1,24 +1,27 @@
 package main
 
 import (
+	"os"
+
 	"github.com/kataras/golog"
 	fass "github.com/vitwit/go-fass"
-	"os"
 )
 
 func main() {
-	cli := fass.NewClient(os.Getenv("USER"), os.Getenv("PASSWORD"),
-		"")
+	cli := fass.NewClient(&fass.FaasGatewayCredentials{
+		Username:       os.Getenv("OPENFAAS_USERNAME"),
+		Password:       os.Getenv("OPENFAAS_PASSWORD"),
+		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"), // example: http://127.0.0.1:8080
+	})
 
-	golog.Info("host: ", cli.BaseURL)
+	golog.Info("HOST: ", cli.URL)
 
 	res, err := cli.GetSystemFunctions()
-
 	if err != nil {
-		golog.Error("Error from system fucntions:  ", err)
+		golog.Error("Error from system functions:  ", err)
 	}
 
-	golog.Info("response of get system:  ", res)
+	golog.Info("response of get system:  ", res.Body)
 
 	data := fass.FunctionDefintion{
 		Service:    "nodeinfo12345",
@@ -52,12 +55,12 @@ func main() {
 		ReadOnlyRootFilesystem: true,
 	}
 
-	clires, err := cli.CreateSystemFunctions(data)
+	resp, err := cli.CreateSystemFunctions(data)
 	if err != nil {
 		golog.Error("Error while creating system:  ", err)
 	}
 
-	golog.Info("response of create system: ", clires)
+	golog.Info("response of create system: ", resp)
 
 	dd := map[string]interface{}{
 		"receiver": "scale-up",
@@ -72,5 +75,4 @@ func main() {
 		golog.Error("Error while getting alert info: ", err)
 	}
 	golog.Info("alert info: ", alertInfo)
-
 }

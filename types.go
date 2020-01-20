@@ -1,6 +1,44 @@
 package go_fass
 
-import "time"
+import (
+	"time"
+)
+
+// HTTP Request
+type FaasRequestDefinition struct {
+	// Method can be GET/PUT/POST/PATCH/DELETE
+	Method string
+	// This is the address of OpenFaas gateway you get e.g. http://127.0.0.1:8080
+	GatewayAddress string
+	// Path of the API being called e.g. /system/functions (Trailing slash must be specified)
+	Path string
+	// URL is the full path of the API being called which is basically gateway address + path (E.g. http://127.0.0.1:8080/system/functions)
+	URL string
+	// http headers
+	Headers map[string]string
+	// query params
+	QueryParams map[string]string
+	// request body to send. Must be byte array
+	Body []byte
+}
+
+// Response holds the response from an API call.
+type HTTPResponse struct {
+	StatusCode int                 // e.g. 200
+	Body       string              // e.g. {"result: success"}
+	Headers    map[string][]string // e.g. Authorization:"Basic qwertyuiop"
+}
+
+// client
+type OpenFaasClient struct {
+	FaasRequestDefinition
+}
+
+type FaasGatewayCredentials struct {
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	GatewayAddress string `json:"gatewayAddress"`
+}
 
 type FunctionListEntry []struct {
 	Name              string            `json:"name"`

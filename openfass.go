@@ -2,72 +2,43 @@ package go_fass
 
 import (
 	"encoding/base64"
-	"github.com/vitwit/go-fass/rest"
 	"os"
+	"strings"
 )
 
-// client
-type Client struct {
-	rest.Request
-}
-
-// options for requestNew
-type options struct {
-	Endpoint string
-	Host     string
-	User     string
-	Password string
-}
-
-func (o *options) baseURL() string {
-	return o.Host + o.Endpoint
-}
-
-func GetRequestObject(cli *Client, method rest.Method, endPoint string) rest.Request {
+func GetRequestDefinition(cli *OpenFaasClient, method, path string) *FaasRequestDefinition {
 	cli.Method = method
-	cli.BaseURL = os.Getenv("HOST_URL") + endPoint
-
-	return cli.Request
+	cli.Path = path // path expects a trailing slash
+	cli.URL = cli.GatewayAddress + cli.Path
+	return &cli.FaasRequestDefinition
 }
 
-// GetRequest
-// @return [Request] a default request object
-func GetRequest(endpoint, host, user, password string) rest.Request {
-	var options options
-
-	if host == "" {
-		options.Host = os.Getenv("HOST_URL")
+func getGatewayAddress(gateway string) string {
+	if gateway == "" {
+		gateway = os.Getenv("OPENFAAS_GATEWAY_ADDR")
+	}
+	// remove leading slash if any
+	if gateway[len(gateway)-1:] == "/" {
+		gateway = strings.TrimRight(gateway, "/")
 	}
 
-	userAndPassword := user + ":" + password
-	encodedAuth := base64.StdEncoding.EncodeToString([]byte(userAndPassword))
+	return gateway
+}
 
+func SetClientRequestOpts(creds *FaasGatewayCredentials) FaasRequestDefinition {
+	userAndPassword := creds.Username + ":" + creds.Password
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte(userAndPassword))
 	requestHeaders := map[string]string{
 		"Accept":        "application/json",
 		"Authorization": "Basic " + encodedAuth,
 	}
 
-	return rest.Request{
-		BaseURL: options.baseURL(),
-		Headers: requestHeaders,
+	return FaasRequestDefinition{
+		GatewayAddress: getGatewayAddress(creds.GatewayAddress),
+		Headers:        requestHeaders,
 	}
-
 }
 
-// DefaultClient is used if no custom HTTP client is defined
-var DefaultClient = rest.DefaultClient
-
-func API(request rest.Request) (*rest.Response, error) {
-	return MakeRequest(request)
-}
-
-func MakeRequest(request rest.Request) (*rest.Response, error) {
-	return DefaultClient.Send(request)
-
-}
-
-// Create a client for openFass
-func NewClient(user, password, endpoint string) *Client {
-	request := GetRequest(endpoint, "", user, password)
-	return &Client{request}
+func NewClient(creds *FaasGatewayCredentials) *OpenFaasClient {
+	return &OpenFaasClient{SetClientRequestOpts(creds)}
 }
