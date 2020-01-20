@@ -2,160 +2,212 @@ package go_fass
 
 import (
 	"fmt"
-	"github.com/vitwit/go-fass/rest"
 	"net/http"
 )
 
 // Create a system function
-func (cl *Client) CreateSystemFunctions(data FunctionDefintion) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodPost, "/system/functions")
+func (cl *OpenFaasClient) CreateSystemFunctions(data FunctionDefintion) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPost, "/system/functions")
 	request.Body = GetRequestBody(data)
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Get system functions
-func (cl *Client) GetSystemFunctions() (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodGet, "/system/functions")
+func (cl *OpenFaasClient) GetSystemFunctions() (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodGet, "/system/functions")
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Get system functions
-func (cl *Client) UpdateSystemFunctions(data FunctionDefintion) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodPut, "/system/functions")
+func (cl *OpenFaasClient) UpdateSystemFunctions(data FunctionDefintion) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPut, "/system/functions")
 	request.Body = GetRequestBody(data)
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Delete a system function
-func (cl *Client) DeleteSystemFunction(data DeleteFunctionRequest) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodDelete, "/system/functions")
+func (cl *OpenFaasClient) DeleteSystemFunction(data DeleteFunctionRequest) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodDelete, "/system/functions")
 	b := GetByteData(data)
 	request.Body = b
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // System alert
-func (cl *Client) SystemAlert(data map[string]interface{}) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodPost, "/system/alert")
+func (cl *OpenFaasClient) SystemAlert(data map[string]interface{}) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPost, "/system/alert")
 	b := GetByteData(data)
 	request.Body = b
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Invoke a function asynchronously in OpenFaaS
-func (cl *Client) AsyncFunction(data map[string]string, functionName string) (*rest.Response, error) {
-	endPoint := fmt.Sprintf("/async-function/%s", functionName)
-	request := GetRequestObject(cl, http.MethodPost, endPoint)
-
+func (cl *OpenFaasClient) AsyncFunction(data map[string]string, functionName string) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPost, fmt.Sprintf("/async-function/%s", functionName))
 	if data != nil {
 		b := GetByteData(data)
 		request.Body = b
 	}
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Invoke a function defined in OpenFaaS
-func (cl *Client) InvokeFunction(data map[string]string, functionName string) (*rest.Response, error) {
-	s := fmt.Sprintf("/function/%s", functionName)
-	request := GetRequestObject(cl, http.MethodPost, s)
+func (cl *OpenFaasClient) InvokeFunction(data map[string]string, functionName string) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPost, fmt.Sprintf("/function/%s", functionName))
 
 	if data != nil {
 		b := GetByteData(data)
 		request.Body = b
 	}
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Scale a function
-func (cl *Client) ScaleFunction(data map[string]string, functionName string) (*rest.Response, error) {
-	s := fmt.Sprintf("/system/scale-function/%s", functionName)
-	request := GetRequestObject(cl, http.MethodPost, s)
-
+func (cl *OpenFaasClient) ScaleFunction(data map[string]string, functionName string) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPost, fmt.Sprintf("/system/scale-function/%s", functionName))
 	if data != nil {
 		b := GetByteData(data)
 		request.Body = b
 	}
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Get a summary of an OpenFaaS function
-func (cl *Client) GetFunctionSummary(data map[string]string, functionName string) (*rest.Response, error) {
-	s := fmt.Sprintf("/system/function/%s", functionName)
-	request := GetRequestObject(cl, http.MethodGet, s)
-
+func (cl *OpenFaasClient) GetFunctionSummary(data map[string]string, functionName string) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodGet, fmt.Sprintf("/system/function/%s", functionName))
 	if data != nil {
 		b := GetByteData(data)
 		request.Body = b
 	}
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Get a list of secret names and metadata from the provider
-func (cl *Client) GetSectrets() (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodGet, "/system/secrets")
+func (cl *OpenFaasClient) GetSecrets() (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodGet, "/system/secrets")
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Create a new secret.
-func (cl *Client) CreateNewSecret(data Secret) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodPost, "/system/secrets")
-
+func (cl *OpenFaasClient) CreateNewSecret(data Secret) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPost, "/system/secrets")
 	if data.Name != "" {
 		b := GetByteData(data)
 		request.Body = b
 	}
 
-	return MakeRequest(cl.Request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Update a secret.
-func (cl *Client) UpdateSecret(data Secret) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodPut, "/system/secrets")
-
+func (cl *OpenFaasClient) UpdateSecret(data Secret) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodPut, "/system/secrets")
 	b := GetByteData(data)
 	request.Body = b
 
-	return MakeRequest(cl.Request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Remove a secret.
-func (cl *Client) DeleteSecret(data SecretName) (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodDelete, "/system/secrets")
-
+func (cl *OpenFaasClient) DeleteSecret(data SecretName) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodDelete, "/system/secrets")
 	b := GetByteData(data)
 	request.Body = b
 
-	return MakeRequest(cl.Request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Get a stream of the logs for a specific function
-func (cl *Client) GetSystemLogs(functionName, since string, tail int64, follow bool) (*rest.Response, error) {
-	s := fmt.Sprintf("/system/logs?name=%s&since=%s&tail=%d&follow=%t", functionName, since, tail, follow)
-	request := GetRequestObject(cl, http.MethodGet, s)
+func (cl *OpenFaasClient) GetSystemLogs(functionName, since string, tail int64, follow bool) (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodGet, fmt.Sprintf("/system/logs?name=%s&since=%s&tail=%d&follow=%t", functionName, since, tail, follow))
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
 // Get info such as provider version number and provider orchestrator
-func (cl *Client) GetSystemInfo() (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodGet, "/system/info")
+func (cl *OpenFaasClient) GetSystemInfo() (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodGet, "/system/info")
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }
 
-// Healthcheck
-func (cl *Client) GetHealthz() (*rest.Response, error) {
-	request := GetRequestObject(cl, http.MethodGet, "/healthz")
+// Health Check
+func (cl *OpenFaasClient) GetHealthz() (*HTTPResponse, error) {
+	request := GetRequestDefinition(cl, http.MethodGet, "/healthz")
 
-	return MakeRequest(request)
+	resp, err := cl.SendHTTPRequest(request)
+	if err != nil {
+		return &HTTPResponse{}, err
+	}
+	return resp, nil
 }

@@ -1,6 +1,46 @@
 package go_fass
 
-import "time"
+import (
+	"time"
+)
+
+//type Method string
+//const (
+//	Get    Method = "GET"
+//	Post   Method = "POST"
+//	Put    Method = "PUT"
+//	Patch  Method = "PATCH"
+//	Delete Method = "DELETE"
+//)
+
+// HTTP Request
+type FaasRequestDefinition struct {
+	Method         string
+	GatewayAddress string
+	Path           string
+	URL            string
+	Headers        map[string]string
+	QueryParams    map[string]string
+	Body           []byte
+}
+
+// Response holds the response from an API call.
+type HTTPResponse struct {
+	StatusCode int                 // e.g. 200
+	Body       string              // e.g. {"result: success"}
+	Headers    map[string][]string // e.g. Authorization:"Basic qwertyuiop"
+}
+
+// client
+type OpenFaasClient struct {
+	FaasRequestDefinition
+}
+
+type FaasGatewayCredentials struct {
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	GatewayAddress string `json:"gatewayAddress"`
+}
 
 type FunctionListEntry []struct {
 	Name              string            `json:"name"`
