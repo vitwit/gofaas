@@ -2,7 +2,6 @@ package go_fass
 
 import (
 	"encoding/base64"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -15,19 +14,15 @@ func GetRequestDefinition(cli *OpenFaasClient, method, path string) *FaasRequest
 }
 
 func getGatewayAddress(gateway string) string {
-	var addr string
 	if gateway == "" {
-		addr = os.Getenv("OPENFAAS_GATEWAY_ADDR")
-	} else {
-		addr = gateway
+		gateway = os.Getenv("OPENFAAS_GATEWAY_ADDR")
 	}
 	// remove leading slash if any
-	fmt.Println(addr)
-	fmt.Println(len(addr))
-	if addr[len(addr)-1:] == "/" {
-		addr = strings.TrimRight(addr, "/")
+	if gateway[len(gateway)-1:] == "/" {
+		gateway = strings.TrimRight(gateway, "/")
 	}
-	return addr
+
+	return gateway
 }
 
 func SetClientRequestOpts(creds *FaasGatewayCredentials) FaasRequestDefinition {
@@ -45,6 +40,5 @@ func SetClientRequestOpts(creds *FaasGatewayCredentials) FaasRequestDefinition {
 }
 
 func NewClient(creds *FaasGatewayCredentials) *OpenFaasClient {
-	request := SetClientRequestOpts(creds)
-	return &OpenFaasClient{request}
+	return &OpenFaasClient{SetClientRequestOpts(creds)}
 }
