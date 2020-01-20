@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4ec25e0c-1812-4b00-a8e9-2e55be58c3fd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rest.go" beforeDir="false" afterPath="$PROJECT_DIR$/rest.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/types.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -84,7 +83,8 @@
     <MESSAGE value="* Deleted REST module&#10;* Clubbed all code in single go_faas module&#10;* Code Cleanup&#10;* Used struct to encapsulate Default HTTP Client instead of global var declaration&#10;* Naming Conventions Changed for the betterment of humanity" />
     <MESSAGE value="* Bug fix in removing trailing slash" />
     <MESSAGE value="* getGatewayAddress function changed to remove unnecessary variable&#10;* Removed unnecessary var in NewClient() function" />
-    <option name="LAST_COMMIT_MESSAGE" value="* getGatewayAddress function changed to remove unnecessary variable&#10;* Removed unnecessary var in NewClient() function" />
+    <MESSAGE value="* returns fixed in BuildHTTPRequest&#10;* Removed dead code" />
+    <option name="LAST_COMMIT_MESSAGE" value="* returns fixed in BuildHTTPRequest&#10;* Removed dead code" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
