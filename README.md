@@ -1,5 +1,5 @@
 
-# go-fass
+# go-faas
 Go SDK for OpenFaaS
 This documentation is under (WIP)
 
@@ -18,7 +18,7 @@ This documentation is under (WIP)
 ### Install Package
 
 ```sh
-	go get github.com/vitwit/go-fass
+	go get github.com/vitwit/go-faas
 ```
 
 
@@ -28,18 +28,18 @@ This documentation is under (WIP)
 
 ```bash
 cp .env.example .env
-Update HOST_URL, USER and PASSWORD
 ```
+Update OPENFAAS_GATEWAY_ADDR, OPENFAAS_USER, OPENFAAS_PASSWORD, OPENFAAS_CLUSTER_TYPE
 
 ### Environment Variable
 
 Update the development environment with your keys, for example:
 
 ```bash
-"export OPENFAAS_HOST_URL='openFasS URL'"
-"export OPENFAAS_USER=''"
-"export OPENFAAS_PASSWORD=''"
-
+$ export OPENFAAS_GATEWAY_ADDR=http://127.0.0.1:8080
+$ export OPENFAAS_USER='admin'
+$ export OPENFAAS_PASSWORD='password'
+$ export OPENFAAS_CLUSTER_TYPE='swarm/kubernetes'
 ```
 <a name="quick-start"></a>
 # Quick Start
@@ -47,9 +47,14 @@ Update the development environment with your keys, for example:
 ### Create a client
 
 ```
-	import fass "go get github.com/vitwit/go-fass";
+import faas "github.com/vitwit/go-faas";
 
-    client := fass.NewClient(os.Getenv("OPENFAAS_USER"), os.Getenv("OPENFAAS_PASSWORD"),"")
+client := faas.NewClient(&faas.FaasGatewayCredentials{
+    Username:       os.Getenv("OPENFAAS_USERNAME"),
+    Password:       os.Getenv("OPENFAAS_PASSWORD"),
+    GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
+    ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
+})
 ```
 
 <details>
@@ -61,7 +66,7 @@ getFunctions
  **Example**
 
  ```
- data, error := client.getFunctions()
+ resp, err := cli.GetSystemFunctions()
 ```
 **Responses**
 
@@ -93,39 +98,39 @@ createFunction
  **Example**
 
  ```
- reqBody := fass.FunctionDefintion{
- 		Service:    "nodeinfo12345",
- 		Network:    "func_functions",
- 		Image:      "functions/nodeinfo:latest",
- 		EnvProcess: "node main.js",
- 		EnvVars: fass.EnvVars{
- 			AdditionalProp1: "string",
- 			AdditionalProp2: "string",
- 			AdditionalProp3: "string",
- 		},
- 		Constraints: []string{
- 			"node.platform.os == linux",
- 		},
- 		Labels: map[string]string{
- 			"example": "func1",
- 		},
- 		Annotations: fass.Annotations{
- 			Topics: "awesome-kafka-topic",
- 			Foo:    "some",
- 		},
- 		RegistryAuth: "dXNlcjpwYXNzd29yZA==",
- 		Limits: fass.Limits{
- 			Memory: "128M",
- 			CPU:    "0.01",
- 		},
- 		Requests: fass.Requests{
- 			Memory: "128M",
- 			CPU:    "0.01",
- 		},
- 		ReadOnlyRootFilesystem: true,
- 	}
+funcdef := &faas.FunctionDefintion{
+    Service:    "nodeinfo12345",
+    Network:    "func_functions",
+    Image:      "functions/nodeinfo:latest",
+    EnvProcess: "node main.js",
+    EnvVars: faas.EnvVars{
+        AdditionalProp1: "string",
+        AdditionalProp2: "string",
+        AdditionalProp3: "string",
+    },
+    Constraints: []string{
+        "node.platform.os == linux",
+    },
+    Labels: map[string]string{
+        "example": "func1",
+    },
+    Annotations: faas.Annotations{
+        Topics: "awesome-kafka-topic",
+        Foo:    "some",
+    },
+    RegistryAuth: "dXNlcjpwYXNzd29yZA==",
+    Limits: faas.Limits{
+        Memory: "128M",
+        CPU:    "0.01",
+    },
+    Requests: faas.Requests{
+        Memory: "128M",
+        CPU:    "0.01",
+    },
+    ReadOnlyRootFilesystem: true,
+}
 
-    data, err := client.CreateSystemFunctions(reqBody)
+resp, err := cli.CreateSystemFunctions(funcdef)
 ```
 **Responses**
 
@@ -168,10 +173,15 @@ updateFunction
 ---
  **Example**
 
- ```js
- data,err = client.updateFunction({
-  /** FunctionDefintion modal, description-Function to update,required-true */
-})
+ ```
+update := &faas.FunctionDefintion{
+    Service: "nodeinfo",
+    Image:   "functions/nodeinfo:latest",
+    Labels: map[string]string{
+        "changedlabelkey": "changedlabelval",
+    },
+},
+resp, err := cli.UpdateSystemFunctions(update)
 ```
 **Responses**
 
@@ -218,9 +228,7 @@ deleteFunction
  **Example**
 
  ```
- data,error := client.deleteFunction({
-  /** DeleteFunctionRequest modal, description-Function to delete,required-true */
-})
+resp, err := cli.DeleteSystemFunction(&faas.DeleteFunctionBodyOpts{FunctionName: "nodeinfo"})
 ```
 **Responses**
 
@@ -267,9 +275,54 @@ handleAlert
  **Example**
 
  ```
- data,error := client.handleAlert({
-  /** undefined modal,type - object, description-Incoming alert */
-})
+sysalert := &faas.SystemAlertBodyOpts{
+    Receiver: "scale-up",
+    Status:   "firing",
+    Alerts: []SystemAlertsStruct{
+    {
+    Status: "firing",
+    Labels: SystemAlertLables{
+        Alertname:    "APIHighInvocationRate",
+        Code:         "200",
+        FunctionName: "func_nodeinfo",
+        Instance:     os.Getenv("OPENFAAS_GATEWAY_ADDR"),
+        Job:          "gateway",
+        Monitor:      "faas-monitor",
+        Service:      "gateway",
+        Severity:     "major",
+        Value:        "8.998200359928017",
+    },
+    Annotations: SystemAlertAnnotations{
+        Description: "High invocation total on gateway:8080",
+        Summary:     "High invocation total on gateway:8080",
+    },
+    StartsAt: time.Now(),
+    EndsAt:   time.Now().Add(time.Hour * 24),
+    },
+    },
+    GroupLabels: GroupLabels{
+    Alertname: "APIHighInvocationRate",
+    Service:   "gateway",
+    },
+    CommonLabels: CommonLabels{
+    Alertname:    "APIHighInvocationRate",
+    Code:         "200",
+    FunctionName: "func_nodeinfo",
+    Instance:     os.Getenv("OPENFAAS_GATEWAY_ADDR"),
+    Job:          "gateway",
+    Monitor:      "faas-monitor",
+    Service:      "gateway",
+    Severity:     "major",
+    Value:        "8.998200359928017",
+    },
+    CommonAnnotations: CommonAnnotations{
+    Description: "High invocation total on gateway:8080",
+    Summary:     "High invocation total on gateway:8080",
+    },
+    ExternalURL: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
+    Version:     "3",
+}
+resp, err := cli.SystemAlert(syslert)
 ```
 **Responses**
 
@@ -303,12 +356,11 @@ invokeFunctionAsync
 ---
  **Example**
 
- ```js
- data,error := client.invokeFunctionAsync({
- input:undefined, /** description-(Optional) data to pass to function,required-false */
-  _pathParams: {
-   functionName:string, /** description-Function name,required-true */
-  }
+```
+resp, err := cli.AsyncFunction(&faas.AsyncInvocationOpts{
+    Body:         "Hey there!",
+    FunctionName: "nodeinfo",
+    CallbackURL:  "http://localhost:5000",
 })
 ```
 **Responses**
@@ -353,11 +405,9 @@ invokeFunction
  **Example**
 
  ```
- data,error := client.invokeFunction({
- input:undefined, /** description-(Optional) data to pass to function,required-false */
-  _pathParams: {
-   functionName:string, /** description-Function name,required-true */
-  }
+resp, err := cli.InvokeFunction(&faas.SyncInvocationOpts{
+    Body:         "Hi there!",
+    FunctionName: "nodeinfo",
 })
 ```
 **Responses**
@@ -401,12 +451,10 @@ scaleFunction
 ---
  **Example**
 
- ```
-  data, error := client.scaleFunction({
- input:undefined, /** description-Function to scale plus replica count,required-false */
-  _pathParams: {
-   functionName:string, /** description-Function name,required-true */
-  }
+```
+resp, err := cli.ScaleFunction(&faas.ScaleFunctionBodyOpts{
+    Service:  "nodeinfo",
+    Replicas: 2,
 })
 ```
 **Responses**
@@ -454,11 +502,7 @@ getFunctionSummary
  **Example**
 
  ```
- data, error := await client.getFunctionSummary({
-  _pathParams: {
-   functionName:string, /** description-Function name,required-true */
-  }
-})
+resp, err := cli.GetFunctionSummary("nodeinfo")
 ```
 **Responses**
 
@@ -505,7 +549,7 @@ getSecrets
  **Example**
 
  ```
-    data, error := client.getSecrets()
+resp, err := client.getSecrets()
 ```
 **Responses**
 
@@ -533,9 +577,10 @@ createSecret
 ---
  **Example**
 
- ```js
- const  { data, error } = await jsFass.createSecret({
-  /** Secret modal, description-A new secret to create,required-true */
+```
+resp, err := cli.CreateNewSecret(&faas.SecretBodyOpts{
+    Name:  "key",
+    Value: "val",
 })
 ```
 **Responses**
@@ -579,9 +624,10 @@ updateSecret
 ---
  **Example**
 
- ```js
- const  { data, error } = await jsFass.updateSecret({
-  /** Secret modal, description-Secret to update,required-true */
+```
+resp, err := cli.UpdateSecret(&faas.SecretBodyOpts{
+    Name:  "key",
+    Value: "updatedval",
 })
 ```
 **Responses**
@@ -629,8 +675,8 @@ deleteSecret
  **Example**
 
  ```
- data, error := client.deleteSecret({
-  /** SecretName modal, description-Secret to delete,required-true */
+resp, err := cli.DeleteSecret(&faas.SecretNameBodyOpts{
+    Name: "key",
 })
 ```
 **Responses**
@@ -678,13 +724,11 @@ getLogsOfAFunction
  **Example**
 
  ```
- data, error := client.getLogsOfAFunction({
-  _params: {
-   name:string, /** description-Function name,required-true */
-   since:string, /** description-Only return logs after a specific date (RFC3339),required-false */
-   tail:integer, /** description-Sets the maximum number of log messages to return, <=0 means unlimited,required-false */
-   follow:boolean, /** description-When true, the request will stream logs until the request timeout,required-false */
-  }
+resp, err := cli.GetSystemLogs(&faas.SystemLogsQueryOpts{
+    Name:   "nodeinfo",
+    Tail:   10,
+    Follow: false,
+    Since: "2020-01-22T07:48:18+00:00"
 })
 ```
 **Responses**
@@ -732,7 +776,7 @@ getInfo
  **Example**
 
  ```
- data, error := client.getInfo()
+resp, err := cli.GetSystemInfo()
 ```
 **Responses**
 
@@ -779,7 +823,7 @@ checkHealth
  **Example**
 
  ```
- data, error := client.checkHealth()
+resp, err := cli.GetHealthz()
 ```
 **Responses**
 

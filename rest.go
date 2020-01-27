@@ -1,4 +1,4 @@
-package go_fass
+package go_faas
 
 import (
 	"bytes"
@@ -16,34 +16,33 @@ func (dc *DefaultClient) New() *DefaultClient {
 }
 
 // AddQueryParameters adds query parameters to the URL.
-func (cl *OpenFaasClient) AddQueryParameters(baseURL string, queryParams map[string]string) string {
-	baseURL += "?"
+func (cl *OpenFaasClient) AddQueryParameters(req *http.Request, queryParams QueryParams) {
 	params := url.Values{}
 	for key, value := range queryParams {
 		params.Add(key, value)
 	}
-	return baseURL + params.Encode()
+	req.URL.RawQuery = params.Encode()
 }
 
 // BuildRequestObject creates the HTTP request object.
-func (cl *OpenFaasClient) BuildHTTPRequest(request *FaasRequestDefinition) (*http.Request, error) {
-	// Add any query parameters to the URL.
-	if len(request.QueryParams) != 0 {
-		request.URL = cl.AddQueryParameters(request.URL, request.QueryParams)
-	}
-
+func (cl *OpenFaasClient) BuildHTTPRequest(reqDef *FaasRequestDefinition) (*http.Request, error) {
 	// make new request
-	req, err := http.NewRequest(request.Method, request.URL, bytes.NewBuffer(request.Body))
+	req, err := http.NewRequest(reqDef.Method, reqDef.URL, bytes.NewBuffer(reqDef.Body))
 	if err != nil {
 		return nil, err
 	}
 
+	// Add any query parameters to the URL.
+	if len(reqDef.QueryParams) != 0 {
+		cl.AddQueryParameters(req, reqDef.QueryParams)
+	}
+
 	// set headers
-	for key, value := range request.Headers {
+	for key, value := range reqDef.Headers {
 		req.Header.Set(key, value)
 	}
 	_, exists := req.Header["Content-Type"]
-	if len(request.Body) > 0 && !exists {
+	if len(reqDef.Body) > 0 && !exists {
 		req.Header.Set("Content-Type", "application/json")
 	}
 

@@ -1,13 +1,13 @@
-package go_fass
+package go_faas
 
 import (
 	"encoding/json"
 	"log"
 )
 
-// GetRequestBody of function defincation
-func GetRequestBody(data FunctionDefintion) []byte {
-	b, err := json.Marshal(data)
+// GetRequestBody of function definition
+func GetRequestBody(data *FunctionDefintion) []byte {
+	b, err := json.Marshal(*data)
 	if err != nil {
 		log.Println(err)
 	}
