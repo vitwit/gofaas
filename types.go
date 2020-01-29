@@ -1,10 +1,12 @@
-package go_fass
+package go_faas
 
 import (
 	"time"
 )
 
 // HTTP Request
+type QueryParams map[string]string
+
 type FaasRequestDefinition struct {
 	// Method can be GET/PUT/POST/PATCH/DELETE
 	Method string
@@ -17,9 +19,11 @@ type FaasRequestDefinition struct {
 	// http headers
 	Headers map[string]string
 	// query params
-	QueryParams map[string]string
+	QueryParams QueryParams
 	// request body to send. Must be byte array
 	Body []byte
+	// Cluster Type e.g. swarm/kubernetes
+	ClusterType string
 }
 
 // Response holds the response from an API call.
@@ -38,6 +42,7 @@ type FaasGatewayCredentials struct {
 	Username       string `json:"username"`
 	Password       string `json:"password"`
 	GatewayAddress string `json:"gatewayAddress"`
+	ClusterType    string `json:"clusterType"`
 }
 
 type FunctionListEntry []struct {
@@ -72,6 +77,17 @@ type Requests struct {
 	CPU    string `json:"cpu"`
 }
 
+type SyncInvocationOpts struct {
+	Body         interface{}
+	FunctionName string
+}
+
+type AsyncInvocationOpts struct {
+	Body         interface{}
+	FunctionName string
+	CallbackURL  string
+}
+
 type FunctionDefintion struct {
 	Service                string            `json:"service"`
 	Network                string            `json:"network"`
@@ -88,7 +104,7 @@ type FunctionDefintion struct {
 	ReadOnlyRootFilesystem bool              `json:"readOnlyRootFilesystem"`
 }
 
-type DeleteFunctionRequest struct {
+type DeleteFunctionBodyOpts struct {
 	FunctionName string `json:"functionName"`
 }
 
@@ -140,7 +156,7 @@ type CommonAnnotations struct {
 	Summary     string `json:"summary"`
 }
 
-type SystemAlert struct {
+type SystemAlertBodyOpts struct {
 	Receiver          string               `json:"receiver"`
 	Status            string               `json:"status"`
 	Alerts            []SystemAlertsStruct `json:"alerts"`
@@ -152,7 +168,12 @@ type SystemAlert struct {
 	GroupKey          int64                `json:"groupKey"`
 }
 
-type Secret struct {
+type ScaleFunctionBodyOpts struct {
+	Service  string `json:"service"`
+	Replicas int    `json:"replicas"`
+}
+
+type SecretBodyOpts struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
@@ -164,6 +185,13 @@ type LogEntry struct {
 	Text      string    `json:"text"`
 }
 
-type SecretName struct {
+type SecretNameBodyOpts struct {
 	Name string `json:"name"`
+}
+
+type SystemLogsQueryOpts struct {
+	Name   string `json:"name"`
+	Since  string `json:"since"`
+	Tail   int    `json:"tail"`
+	Follow bool   `json:"follow"`
 }
