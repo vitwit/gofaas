@@ -2,12 +2,18 @@ package go_faas
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"os"
 	"testing"
 	"time"
 )
 
-func TestCreateSystemFunctions(t *testing.T) {
+type GoFaasTestSuite struct {
+	suite.Suite
+	cli *OpenFaasClient
+}
+
+func (suite *GoFaasTestSuite) SetupTest() {
 	cli, err := NewClient(&FaasGatewayCredentials{
 		Username:       os.Getenv("OPENFAAS_USERNAME"),
 		Password:       os.Getenv("OPENFAAS_PASSWORD"),
@@ -15,9 +21,16 @@ func TestCreateSystemFunctions(t *testing.T) {
 		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
 	})
 	if err != nil {
-		t.Fatal(err)
+		suite.Error(err)
 	}
+	suite.cli = cli
+}
 
+func TestExampleTestSuite(t *testing.T) {
+	suite.Run(t, new(GoFaasTestSuite))
+}
+
+func (suite *GoFaasTestSuite) TestCreateSystemFunctions() {
 	testcases := []struct {
 		Name          string
 		FunctionDef   *FunctionDefintion
@@ -109,48 +122,28 @@ func TestCreateSystemFunctions(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.CreateSystemFunctions(c.FunctionDef)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.CreateSystemFunctions(c.FunctionDef)
 			if err != nil {
-				t.Errorf("error while calling %s/system/functions: %v", os.Getenv("OPENFAAS_GATEWAY_ADDR"), err)
+				suite.T().Errorf("error while calling %s/system/functions: %v", suite.cli.GatewayAddress, err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestGetSystemFunctions(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run("GetSystemFunctions", func(t *testing.T) {
-		resp, err := cli.GetSystemFunctions()
+func (suite *GoFaasTestSuite) TestGetSystemFunctions() {
+	suite.T().Run("GetSystemFunctions", func(t *testing.T) {
+		resp, err := suite.cli.GetSystemFunctions()
 		if err != nil {
-			t.Errorf("error while getting system functions: %v", err)
+			suite.T().Errorf("error while getting system functions: %v", err)
 		}
-		assert.Equal(t, 200, resp.StatusCode)
+		assert.Equal(suite.T(), 200, resp.StatusCode)
 	})
 }
 
-func TestUpdateSystemFunctions(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestUpdateSystemFunctions() {
 	testcases := []struct {
 		Name          string
 		FunctionDef   *FunctionDefintion
@@ -196,28 +189,18 @@ func TestUpdateSystemFunctions(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.UpdateSystemFunctions(c.FunctionDef)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.UpdateSystemFunctions(c.FunctionDef)
 			if err != nil {
 				t.Fatalf("error while calling [PUT] %s/system/functions: %v", os.Getenv("OPENFAAS_GATEWAY_ADDR"), err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestDeleteSystemFunctions(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestDeleteSystemFunctions() {
 	testcases := []struct {
 		Name          string
 		DeleteRequest *DeleteFunctionBodyOpts
@@ -245,28 +228,18 @@ func TestDeleteSystemFunctions(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.DeleteSystemFunction(c.DeleteRequest)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.DeleteSystemFunction(c.DeleteRequest)
 			if err != nil {
-				t.Errorf("error while calling [DELETE] %s/system/functions: %v", os.Getenv("OPENFAAS_GATEWAY_ADDR"), err)
+				suite.T().Errorf("error while calling [DELETE] %s/system/functions: %v", suite.cli.GatewayAddress, err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestSystemAlert(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestSystemAlert() {
 	testcases := []struct {
 		Name          string
 		AlertDef      *SystemAlertBodyOpts
@@ -328,28 +301,18 @@ func TestSystemAlert(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.SystemAlert(c.AlertDef)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.SystemAlert(c.AlertDef)
 			if err != nil {
-				t.Errorf("error while setting system alert: %v", err)
+				suite.T().Errorf("error while setting system alert: %v", err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestAsyncFunction(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestAsyncFunction() {
 	testcases := []struct {
 		Name          string
 		Data          interface{}
@@ -391,32 +354,22 @@ func TestAsyncFunction(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.AsyncFunction(&AsyncInvocationOpts{
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.AsyncFunction(&AsyncInvocationOpts{
 				Body:         c.Data,
 				FunctionName: c.FuncName,
 				CallbackURL:  c.CallbackURL,
 			})
 			if err != nil {
-				t.Errorf("error while asynchronously invoking func %s: %v", c.FuncName, err)
+				suite.T().Errorf("error while asynchronously invoking func %s: %v", c.FuncName, err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestInvokeFunction(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestInvokeFunction() {
 	testcases := []struct {
 		Name          string
 		Data          interface{}
@@ -454,29 +407,21 @@ func TestInvokeFunction(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		resp, err := cli.InvokeFunction(&SyncInvocationOpts{
-			Body:         c.Data,
-			FunctionName: c.FuncName,
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.InvokeFunction(&SyncInvocationOpts{
+				Body:         c.Data,
+				FunctionName: c.FuncName,
+			})
+			if err != nil {
+				suite.T().Errorf("error while invoking func %s: %v", c.FuncName, err)
+			}
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
-		if err != nil {
-			t.Errorf("error while invoking func %s: %v", c.FuncName, err)
-		}
-		assert.Equal(t, nil, err)
-		assert.Equal(t, c.StatusCode, resp.StatusCode)
 	}
 }
 
-func TestScaleFunction(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestScaleFunction() {
 	testcases := []struct {
 		Name          string
 		Body          *ScaleFunctionBodyOpts
@@ -513,28 +458,18 @@ func TestScaleFunction(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.ScaleFunction(c.Body)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.ScaleFunction(c.Body)
 			if err != nil {
-				t.Errorf("error while scaling func %s: %v", c.Body.Service, err)
+				suite.T().Errorf("error while scaling func %s: %v", c.Body.Service, err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestGetFunctionSummary(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestGetFunctionSummary() {
 	testcases := []struct {
 		Name          string
 		FuncName      string
@@ -556,28 +491,18 @@ func TestGetFunctionSummary(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.GetFunctionSummary(c.FuncName)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.GetFunctionSummary(c.FuncName)
 			if err != nil {
-				t.Errorf("error while getting summary for func %s: %v", c.FuncName, err)
+				suite.T().Errorf("error while getting summary for func %s: %v", c.FuncName, err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestCreateNewSecret(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 	testcases := []struct {
 		Name          string
 		Body          *SecretBodyOpts
@@ -636,51 +561,31 @@ func TestCreateNewSecret(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.CreateNewSecret(c.Body)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.CreateNewSecret(c.Body)
 			if err != nil {
-				t.Errorf("error creating secret: %v", err)
+				suite.T().Errorf("error creating secret: %v", err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestGetSecrets(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run("List", func(t *testing.T) {
-		resp, err := cli.GetSecrets()
+func (suite *GoFaasTestSuite) TestGetSecrets() {
+	suite.T().Run("List", func(t *testing.T) {
+		resp, err := suite.cli.GetSecrets()
 		if err != nil {
-			t.Errorf("error getting secrets list: %v", err)
+			suite.T().Errorf("error getting secrets list: %v", err)
 		}
-		assert.Equal(t, nil, err)
-		assert.Equal(t, resp.StatusCode, 200)
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), resp.StatusCode, 200)
 	})
 }
 
-func TestUpdateSecret(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if cli.ClusterType == "swarm" {
-		t.Skip("Cluster swarm does not have an update secret method")
+func (suite *GoFaasTestSuite) TestUpdateSecret() {
+	if suite.cli.ClusterType == "swarm" {
+		suite.T().Skip("Cluster swarm does not have an update secret method")
 	}
 
 	testcases := []struct {
@@ -732,28 +637,18 @@ func TestUpdateSecret(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.UpdateSecret(c.Body)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.UpdateSecret(c.Body)
 			if err != nil {
-				t.Errorf("error updating secret: %v", err)
+				suite.T().Errorf("error updating secret: %v", err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestDeleteSecret(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestDeleteSecret() {
 	testcases := []struct {
 		Name          string
 		Body          *SecretNameBodyOpts
@@ -785,29 +680,19 @@ func TestDeleteSecret(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.DeleteSecret(c.Body)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.DeleteSecret(c.Body)
 			if err != nil {
-				t.Errorf("error deleting secret: %v", err)
+				suite.T().Errorf("error deleting secret: %v", err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestGetSystemLogs(t *testing.T) {
-	t.Skip() // unable to parse "Since" TODO: Check parsing query string
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func (suite *GoFaasTestSuite) TestGetSystemLogs() {
+	suite.T().Skip() // unable to parse "Since" TODO: Check parsing query string
 	testcases := []struct {
 		Name          string
 		Query         *SystemLogsQueryOpts
@@ -847,55 +732,60 @@ func TestGetSystemLogs(t *testing.T) {
 	}
 
 	for _, c := range testcases {
-		t.Run(c.Name, func(t *testing.T) {
-			resp, err := cli.GetSystemLogs(c.Query)
+		suite.T().Run(c.Name, func(t *testing.T) {
+			resp, err := suite.cli.GetSystemLogs(c.Query)
 			if err != nil {
-				t.Errorf("error getting system logs: %v", err)
+				suite.T().Errorf("error getting system logs: %v", err)
 			}
-			assert.Equal(t, nil, err)
-			assert.Equal(t, c.StatusCode, resp.StatusCode)
+			assert.Equal(suite.T(), nil, err)
+			assert.Equal(suite.T(), c.StatusCode, resp.StatusCode)
 		})
 	}
 }
 
-func TestGetSystemInfo(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run("GetSystemInfo", func(t *testing.T) {
-		resp, err := cli.GetSystemInfo()
+func (suite *GoFaasTestSuite) TestGetSystemInfo() {
+	suite.T().Run("GetSystemInfo", func(t *testing.T) {
+		resp, err := suite.cli.GetSystemInfo()
 		if err != nil {
-			t.Errorf("error getting system logs: %v", err)
+			suite.T().Errorf("error getting system logs: %v", err)
 		}
-		assert.Equal(t, nil, err)
-		assert.Equal(t, 200, resp.StatusCode)
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 200, resp.StatusCode)
 	})
 }
 
-func TestGetHealthz(t *testing.T) {
-	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
-		Password:       os.Getenv("OPENFAAS_PASSWORD"),
-		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
-		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
+func (suite *GoFaasTestSuite) TestGetHealthz() {
+	suite.T().Run("GetHealthz", func(t *testing.T) {
+		resp, err := suite.cli.GetHealthz()
+		if err != nil {
+			suite.T().Errorf("error getting system logs: %v", err)
+		}
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 200, resp.StatusCode)
 	})
+}
+
+func (suite *GoFaasTestSuite) TearDownSuite() {
+	_, err := suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "nodeinfo123456"})
 	if err != nil {
-		t.Fatal(err)
+		suite.T().Logf("error occurred while tearing down nodeinfo1235: %v", err)
+		_, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"})
+		if err != nil {
+			suite.T().Logf("error occurred while tearing down yetanothernodeinfo: %v", err)
+		}
 	}
 
-	t.Run("GetHealthz", func(t *testing.T) {
-		resp, err := cli.GetHealthz()
-		if err != nil {
-			t.Errorf("error getting system logs: %v", err)
-		}
-		assert.Equal(t, nil, err)
-		assert.Equal(t, 200, resp.StatusCode)
-	})
+	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey101"})
+	if err != nil {
+		suite.T().Logf("Error tearing down secretkey101 : %v", err)
+	}
+	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey102"})
+	if err != nil {
+		suite.T().Logf("Error tearing down secretkey101 : %v", err)
+	}
+	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey103"})
+	if err != nil {
+		suite.T().Logf("Error tearing down secretkey101 : %v", err)
+	}
+
 }
