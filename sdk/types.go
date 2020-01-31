@@ -1,4 +1,4 @@
-package go_faas
+package sdk
 
 import (
 	"time"
@@ -6,6 +6,18 @@ import (
 
 // HTTP Request
 type QueryParams map[string]string
+
+// Response holds the response from an API call.
+type HTTPResponse struct {
+	StatusCode int                 // e.g. 200
+	Body       string              // e.g. {"result: success"}
+	Headers    map[string][]string // e.g. Authorization:"Basic qwertyuiop"
+}
+
+// client
+type OpenFaasClient struct {
+	*FaasRequestDefinition
+}
 
 type FaasRequestDefinition struct {
 	// Method can be GET/PUT/POST/PATCH/DELETE
@@ -22,20 +34,8 @@ type FaasRequestDefinition struct {
 	QueryParams QueryParams
 	// request body to send. Must be byte array
 	Body []byte
-	// Cluster Type e.g. swarm/kubernetes
+	// Cluster Type valid e.g => swarm/kubernetes
 	ClusterType string
-}
-
-// Response holds the response from an API call.
-type HTTPResponse struct {
-	StatusCode int                 // e.g. 200
-	Body       string              // e.g. {"result: success"}
-	Headers    map[string][]string // e.g. Authorization:"Basic qwertyuiop"
-}
-
-// client
-type OpenFaasClient struct {
-	FaasRequestDefinition
 }
 
 type FaasGatewayCredentials struct {

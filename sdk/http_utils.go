@@ -1,4 +1,4 @@
-package go_faas
+package sdk
 
 import (
 	"encoding/json"

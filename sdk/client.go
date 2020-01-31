@@ -1,8 +1,7 @@
-package go_faas
+package sdk
 
 import (
 	"encoding/base64"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -11,7 +10,7 @@ func GetRequestDefinition(cli *OpenFaasClient, method, path string) *FaasRequest
 	cli.Method = method
 	cli.Path = path // path expects a trailing slash
 	cli.URL = cli.GatewayAddress + cli.Path
-	return &cli.FaasRequestDefinition
+	return cli.FaasRequestDefinition
 }
 
 func getGatewayAddress(gateway string) string {
@@ -26,7 +25,7 @@ func getGatewayAddress(gateway string) string {
 	return gateway
 }
 
-func SetClientRequestOpts(creds *FaasGatewayCredentials) FaasRequestDefinition {
+func InitOpenFaasClient(creds *FaasGatewayCredentials) *OpenFaasClient {
 	userAndPassword := creds.Username + ":" + creds.Password
 	encodedAuth := base64.StdEncoding.EncodeToString([]byte(userAndPassword))
 	requestHeaders := map[string]string{
@@ -34,16 +33,10 @@ func SetClientRequestOpts(creds *FaasGatewayCredentials) FaasRequestDefinition {
 		"Authorization": "Basic " + encodedAuth,
 	}
 
-	return FaasRequestDefinition{
+	reqDef := &FaasRequestDefinition{
 		GatewayAddress: getGatewayAddress(creds.GatewayAddress),
 		Headers:        requestHeaders,
-		ClusterType:    creds.ClusterType,
 	}
-}
 
-func NewClient(creds *FaasGatewayCredentials) (*OpenFaasClient, error) {
-	if creds.ClusterType != "swarm" && creds.ClusterType != "kubernetes" {
-		return &OpenFaasClient{}, fmt.Errorf("invalid cluster type %v", creds.ClusterType)
-	}
-	return &OpenFaasClient{SetClientRequestOpts(creds)}, nil
+	return &OpenFaasClient{reqDef}
 }

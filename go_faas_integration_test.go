@@ -2,7 +2,10 @@
 
 package go_faas
 
-import "github.com/stretchr/testify/assert"
+import (
+	"github.com/stretchr/testify/assert"
+	"github.com/vitwit/go-faas/sdk"
+)
 
 func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	funcName := "integration_testnodeinfo"
@@ -16,7 +19,7 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	assert.Equal(suite.T(), 200, resp.StatusCode)
 
 	// create a func
-	def := &FunctionDefintion{
+	def := &sdk.FunctionDefintion{
 		Service:    funcName,
 		Network:    "func_functions",
 		Image:      "functions/nodeinfo:latest",
@@ -27,16 +30,16 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 		Labels: map[string]string{
 			"labelkey": "labelval",
 		},
-		Annotations: Annotations{
+		Annotations: sdk.Annotations{
 			Topics: "awesome-kafka-topic",
 			Foo:    "some",
 		},
 		RegistryAuth: "dXNlcjpwYXNzd29yZA==",
-		Limits: Limits{
+		Limits: sdk.Limits{
 			Memory: "128M",
 			CPU:    "0.01",
 		},
-		Requests: Requests{
+		Requests: sdk.Requests{
 			Memory: "128M",
 			CPU:    "0.01",
 		},
@@ -58,10 +61,10 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	assert.Equal(suite.T(), 200, resp.StatusCode)
 
 	// update the func
-	update := &FunctionDefintion{
+	update := &sdk.FunctionDefintion{
 		Service: funcName,
 		Image:   "functions/nodeinfo:latest",
-		Limits: Limits{
+		Limits: sdk.Limits{
 			Memory: "130M",
 			CPU:    "0.01",
 		},
@@ -74,7 +77,7 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	assert.Equal(suite.T(), 202, resp.StatusCode)
 
 	// scale up the func
-	resp, err = suite.cli.ScaleFunction(&ScaleFunctionBodyOpts{
+	resp, err = suite.cli.ScaleFunction(&sdk.ScaleFunctionBodyOpts{
 		Service:  funcName,
 		Replicas: 3,
 	})
@@ -85,7 +88,7 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	assert.Equal(suite.T(), 202, resp.StatusCode)
 
 	// scale down the func
-	resp, err = suite.cli.ScaleFunction(&ScaleFunctionBodyOpts{
+	resp, err = suite.cli.ScaleFunction(&sdk.ScaleFunctionBodyOpts{
 		Service:  funcName,
 		Replicas: 1,
 	})
@@ -96,7 +99,7 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	assert.Equal(suite.T(), 202, resp.StatusCode)
 
 	// delete the func
-	resp, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: funcName})
+	resp, err = suite.cli.DeleteSystemFunction(&sdk.DeleteFunctionBodyOpts{FunctionName: funcName})
 	if err != nil {
 		suite.T().Fatalf("DeleteSystemFunction/Error: %v", err)
 	}
@@ -117,7 +120,7 @@ func (suite *GoFaasTestSuite) TestSecretsCRUD() {
 	assert.Equal(suite.T(), resp.StatusCode, 200)
 
 	// create new secret
-	resp, err = suite.cli.CreateNewSecret(&SecretBodyOpts{
+	resp, err = suite.cli.CreateNewSecret(&sdk.SecretBodyOpts{
 		Name:  secretName,
 		Value: secretVal,
 	})
@@ -129,7 +132,7 @@ func (suite *GoFaasTestSuite) TestSecretsCRUD() {
 
 	// update the secret if not a swarm cluster
 	if suite.cli.ClusterType != "swarm" {
-		resp, err = suite.cli.UpdateSecret(&SecretBodyOpts{
+		resp, err = suite.cli.UpdateSecret(&sdk.SecretBodyOpts{
 			Name:  secretName,
 			Value: "updated_integration_test_secret_val",
 		})
@@ -141,7 +144,7 @@ func (suite *GoFaasTestSuite) TestSecretsCRUD() {
 	}
 
 	// delete the secret
-	resp, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: secretName})
+	resp, err = suite.cli.DeleteSecret(&sdk.SecretNameBodyOpts{Name: secretName})
 	if err != nil {
 		suite.T().Fatalf("DeleteSecret/Error: %v", err)
 	}

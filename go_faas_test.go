@@ -3,6 +3,7 @@ package go_faas
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"github.com/vitwit/go-faas/sdk"
 	"os"
 	"testing"
 	"time"
@@ -10,11 +11,11 @@ import (
 
 type GoFaasTestSuite struct {
 	suite.Suite
-	cli *OpenFaasClient
+	cli *sdk.OpenFaasClient
 }
 
 func (suite *GoFaasTestSuite) SetupTest() {
-	cli, err := NewClient(&FaasGatewayCredentials{
+	cli, err := NewClient(&sdk.FaasGatewayCredentials{
 		Username:       os.Getenv("OPENFAAS_USERNAME"),
 		Password:       os.Getenv("OPENFAAS_PASSWORD"),
 		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
@@ -33,18 +34,18 @@ func TestExampleTestSuite(t *testing.T) {
 func (suite *GoFaasTestSuite) TestCreateSystemFunctions() {
 	testcases := []struct {
 		Name          string
-		FunctionDef   *FunctionDefintion
+		FunctionDef   *sdk.FunctionDefintion
 		StatusCode    int
 		ErrorExpected bool
 	}{
 		{
 			Name: "Function/nodeinfo123456",
-			FunctionDef: &FunctionDefintion{
+			FunctionDef: &sdk.FunctionDefintion{
 				Service:    "nodeinfo123456",
 				Network:    "func_functions",
 				Image:      "functions/nodeinfo:latest",
 				EnvProcess: "node main.js",
-				EnvVars: EnvVars{
+				EnvVars: sdk.EnvVars{
 					AdditionalProp1: "string",
 					AdditionalProp2: "string",
 					AdditionalProp3: "string",
@@ -55,16 +56,16 @@ func (suite *GoFaasTestSuite) TestCreateSystemFunctions() {
 				Labels: map[string]string{
 					"example": "func1",
 				},
-				Annotations: Annotations{
+				Annotations: sdk.Annotations{
 					Topics: "awesome-kafka-topic",
 					Foo:    "some",
 				},
 				RegistryAuth: "dXNlcjpwYXNzd29yZA==",
-				Limits: Limits{
+				Limits: sdk.Limits{
 					Memory: "128M",
 					CPU:    "0.01",
 				},
-				Requests: Requests{
+				Requests: sdk.Requests{
 					Memory: "128M",
 					CPU:    "0.01",
 				},
@@ -75,7 +76,7 @@ func (suite *GoFaasTestSuite) TestCreateSystemFunctions() {
 		},
 		{
 			Name: "Function/yetanothernodeinfo",
-			FunctionDef: &FunctionDefintion{
+			FunctionDef: &sdk.FunctionDefintion{
 				Service:    "yetanothernodeinfo",
 				Network:    "func_functions",
 				Image:      "functions/nodeinfo:latest",
@@ -87,11 +88,11 @@ func (suite *GoFaasTestSuite) TestCreateSystemFunctions() {
 					"label": "val",
 				},
 				RegistryAuth: "dXNlcjpwYXNzd29yZA==",
-				Limits: Limits{
+				Limits: sdk.Limits{
 					Memory: "128M",
 					CPU:    "0.01",
 				},
-				Requests: Requests{
+				Requests: sdk.Requests{
 					Memory: "128M",
 					CPU:    "0.01",
 				},
@@ -101,17 +102,17 @@ func (suite *GoFaasTestSuite) TestCreateSystemFunctions() {
 		},
 		{
 			Name: "Function/InvalidService",
-			FunctionDef: &FunctionDefintion{
+			FunctionDef: &sdk.FunctionDefintion{
 				Service:      "InvalidService",
 				Network:      "func_functions",
 				Image:        "",
 				EnvProcess:   "node main.js",
 				RegistryAuth: "dXNlcjpwYXNzd29yZA==",
-				Limits: Limits{
+				Limits: sdk.Limits{
 					Memory: "128M",
 					CPU:    "0.01",
 				},
-				Requests: Requests{
+				Requests: sdk.Requests{
 					Memory: "128M",
 					CPU:    "0.01",
 				},
@@ -146,13 +147,13 @@ func (suite *GoFaasTestSuite) TestGetSystemFunctions() {
 func (suite *GoFaasTestSuite) TestUpdateSystemFunctions() {
 	testcases := []struct {
 		Name          string
-		FunctionDef   *FunctionDefintion
+		FunctionDef   *sdk.FunctionDefintion
 		ExpectedError bool
 		StatusCode    int
 	}{
 		{
 			Name: "nodeinfo123456/UpdateLabel",
-			FunctionDef: &FunctionDefintion{
+			FunctionDef: &sdk.FunctionDefintion{
 				Service: "nodeinfo123456",
 				Image:   "functions/nodeinfo:latest",
 				Labels: map[string]string{
@@ -177,7 +178,7 @@ func (suite *GoFaasTestSuite) TestUpdateSystemFunctions() {
 		//},
 		{
 			Name: "nodeinfo123456/NoImage",
-			FunctionDef: &FunctionDefintion{
+			FunctionDef: &sdk.FunctionDefintion{
 				Service: "nodeinfo123456",
 				Labels: map[string]string{
 					"changedlabelkey": "changedlabelval",
@@ -203,25 +204,25 @@ func (suite *GoFaasTestSuite) TestUpdateSystemFunctions() {
 func (suite *GoFaasTestSuite) TestDeleteSystemFunctions() {
 	testcases := []struct {
 		Name          string
-		DeleteRequest *DeleteFunctionBodyOpts
+		DeleteRequest *sdk.DeleteFunctionBodyOpts
 		ErrorExpected bool
 		StatusCode    int
 	}{
 		{
 			Name:          "yetanothernodeinfo",
-			DeleteRequest: &DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"},
+			DeleteRequest: &sdk.DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"},
 			ErrorExpected: false,
 			StatusCode:    202,
 		},
 		{
 			Name:          "InvalidFunc",
-			DeleteRequest: &DeleteFunctionBodyOpts{FunctionName: "notexists"},
+			DeleteRequest: &sdk.DeleteFunctionBodyOpts{FunctionName: "notexists"},
 			ErrorExpected: true,
 			StatusCode:    404,
 		},
 		{
 			Name:          "NoFunc",
-			DeleteRequest: &DeleteFunctionBodyOpts{},
+			DeleteRequest: &sdk.DeleteFunctionBodyOpts{},
 			ErrorExpected: true,
 			StatusCode:    400,
 		},
@@ -242,19 +243,19 @@ func (suite *GoFaasTestSuite) TestDeleteSystemFunctions() {
 func (suite *GoFaasTestSuite) TestSystemAlert() {
 	testcases := []struct {
 		Name          string
-		AlertDef      *SystemAlertBodyOpts
+		AlertDef      *sdk.SystemAlertBodyOpts
 		ExpectedError bool
 		StatusCode    int
 	}{
 		{
 			Name: "APIHighInvocationRate",
-			AlertDef: &SystemAlertBodyOpts{
+			AlertDef: &sdk.SystemAlertBodyOpts{
 				Receiver: "scale-up",
 				Status:   "firing",
-				Alerts: []SystemAlertsStruct{
+				Alerts: []sdk.SystemAlertsStruct{
 					{
 						Status: "firing",
-						Labels: SystemAlertLables{
+						Labels: sdk.SystemAlertLables{
 							Alertname:    "APIHighInvocationRate",
 							Code:         "200",
 							FunctionName: "func_nodeinfo",
@@ -265,7 +266,7 @@ func (suite *GoFaasTestSuite) TestSystemAlert() {
 							Severity:     "major",
 							Value:        "8.998200359928017",
 						},
-						Annotations: SystemAlertAnnotations{
+						Annotations: sdk.SystemAlertAnnotations{
 							Description: "High invocation total on gateway:8080",
 							Summary:     "High invocation total on gateway:8080",
 						},
@@ -273,11 +274,11 @@ func (suite *GoFaasTestSuite) TestSystemAlert() {
 						EndsAt:   time.Now().Add(time.Hour * 24),
 					},
 				},
-				GroupLabels: GroupLabels{
+				GroupLabels: sdk.GroupLabels{
 					Alertname: "APIHighInvocationRate",
 					Service:   "gateway",
 				},
-				CommonLabels: CommonLabels{
+				CommonLabels: sdk.CommonLabels{
 					Alertname:    "APIHighInvocationRate",
 					Code:         "200",
 					FunctionName: "func_nodeinfo",
@@ -288,7 +289,7 @@ func (suite *GoFaasTestSuite) TestSystemAlert() {
 					Severity:     "major",
 					Value:        "8.998200359928017",
 				},
-				CommonAnnotations: CommonAnnotations{
+				CommonAnnotations: sdk.CommonAnnotations{
 					Description: "High invocation total on gateway:8080",
 					Summary:     "High invocation total on gateway:8080",
 				},
@@ -355,7 +356,7 @@ func (suite *GoFaasTestSuite) TestAsyncFunction() {
 
 	for _, c := range testcases {
 		suite.T().Run(c.Name, func(t *testing.T) {
-			resp, err := suite.cli.AsyncFunction(&AsyncInvocationOpts{
+			resp, err := suite.cli.AsyncFunction(&sdk.AsyncInvocationOpts{
 				Body:         c.Data,
 				FunctionName: c.FuncName,
 				CallbackURL:  c.CallbackURL,
@@ -408,7 +409,7 @@ func (suite *GoFaasTestSuite) TestInvokeFunction() {
 
 	for _, c := range testcases {
 		suite.T().Run(c.Name, func(t *testing.T) {
-			resp, err := suite.cli.InvokeFunction(&SyncInvocationOpts{
+			resp, err := suite.cli.InvokeFunction(&sdk.SyncInvocationOpts{
 				Body:         c.Data,
 				FunctionName: c.FuncName,
 			})
@@ -424,13 +425,13 @@ func (suite *GoFaasTestSuite) TestInvokeFunction() {
 func (suite *GoFaasTestSuite) TestScaleFunction() {
 	testcases := []struct {
 		Name          string
-		Body          *ScaleFunctionBodyOpts
+		Body          *sdk.ScaleFunctionBodyOpts
 		ErrorExpected bool
 		StatusCode    int
 	}{
 		{
 			Name: "nodeinfo/ScaleUp/2",
-			Body: &ScaleFunctionBodyOpts{
+			Body: &sdk.ScaleFunctionBodyOpts{
 				Service:  "nodeinfo",
 				Replicas: 2,
 			},
@@ -439,7 +440,7 @@ func (suite *GoFaasTestSuite) TestScaleFunction() {
 		},
 		{
 			Name: "nodeinfo/ScaleDown/1",
-			Body: &ScaleFunctionBodyOpts{
+			Body: &sdk.ScaleFunctionBodyOpts{
 				Service:  "nodeinfo",
 				Replicas: 1,
 			},
@@ -448,7 +449,7 @@ func (suite *GoFaasTestSuite) TestScaleFunction() {
 		},
 		{
 			Name: "InvalidFunc/ScaleUp/2",
-			Body: &ScaleFunctionBodyOpts{
+			Body: &sdk.ScaleFunctionBodyOpts{
 				Service:  "InvalidFunc",
 				Replicas: 2,
 			},
@@ -505,13 +506,13 @@ func (suite *GoFaasTestSuite) TestGetFunctionSummary() {
 func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 	testcases := []struct {
 		Name          string
-		Body          *SecretBodyOpts
+		Body          *sdk.SecretBodyOpts
 		ExpectedError bool
 		StatusCode    int
 	}{
 		{
 			Name: "secretkey101",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name:  "secretkey101",
 				Value: "secretval101",
 			},
@@ -520,7 +521,7 @@ func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 		},
 		{
 			Name: "secretkey102",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name:  "secretkey102",
 				Value: "secretval102",
 			},
@@ -529,7 +530,7 @@ func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 		},
 		{
 			Name: "secretkey103",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name:  "secretkey103",
 				Value: "secretval103",
 			},
@@ -538,7 +539,7 @@ func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 		},
 		{
 			Name: "<NoSecretName>",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Value: "secretval101",
 			},
 			ExpectedError: true,
@@ -546,7 +547,7 @@ func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 		},
 		{
 			Name: "<NoSecretVal>",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name: "secretkey101",
 			},
 			ExpectedError: true,
@@ -554,7 +555,7 @@ func (suite *GoFaasTestSuite) TestCreateNewSecret() {
 		},
 		{
 			Name:          "<NoSecretBody>",
-			Body:          &SecretBodyOpts{},
+			Body:          &sdk.SecretBodyOpts{},
 			ExpectedError: true,
 			StatusCode:    500,
 		},
@@ -590,13 +591,13 @@ func (suite *GoFaasTestSuite) TestUpdateSecret() {
 
 	testcases := []struct {
 		Name          string
-		Body          *SecretBodyOpts
+		Body          *sdk.SecretBodyOpts
 		ExpectedError bool
 		StatusCode    int
 	}{
 		{
 			Name: "secretkey102",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name:  "secretkey102",
 				Value: "updatedsecretval102",
 			},
@@ -605,7 +606,7 @@ func (suite *GoFaasTestSuite) TestUpdateSecret() {
 		},
 		{
 			Name: "secretkey103",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name: "secretkey103",
 			},
 			ExpectedError: false,
@@ -613,13 +614,13 @@ func (suite *GoFaasTestSuite) TestUpdateSecret() {
 		},
 		{
 			Name:          "<NoSecretBody>",
-			Body:          &SecretBodyOpts{},
+			Body:          &sdk.SecretBodyOpts{},
 			ExpectedError: true,
 			StatusCode:    404,
 		},
 		{
 			Name: "<NoSecretName>",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Value: "updatedsecretval101",
 			},
 			ExpectedError: true,
@@ -627,7 +628,7 @@ func (suite *GoFaasTestSuite) TestUpdateSecret() {
 		},
 		{
 			Name: "<InvalidSecret>",
-			Body: &SecretBodyOpts{
+			Body: &sdk.SecretBodyOpts{
 				Name:  "InvalidSecret",
 				Value: "updatedsecretval101",
 			},
@@ -651,13 +652,13 @@ func (suite *GoFaasTestSuite) TestUpdateSecret() {
 func (suite *GoFaasTestSuite) TestDeleteSecret() {
 	testcases := []struct {
 		Name          string
-		Body          *SecretNameBodyOpts
+		Body          *sdk.SecretNameBodyOpts
 		ExpectedError bool
 		StatusCode    int
 	}{
 		{
 			Name: "secretkey101",
-			Body: &SecretNameBodyOpts{
+			Body: &sdk.SecretNameBodyOpts{
 				Name: "secretkey101",
 			},
 			ExpectedError: false,
@@ -665,13 +666,13 @@ func (suite *GoFaasTestSuite) TestDeleteSecret() {
 		},
 		{
 			Name:          "<NoSecretBody>",
-			Body:          &SecretNameBodyOpts{},
+			Body:          &sdk.SecretNameBodyOpts{},
 			ExpectedError: true,
 			StatusCode:    404,
 		},
 		{
 			Name: "<InvalidSecret>",
-			Body: &SecretNameBodyOpts{
+			Body: &sdk.SecretNameBodyOpts{
 				Name: "DoesNotExist",
 			},
 			ExpectedError: true,
@@ -695,13 +696,13 @@ func (suite *GoFaasTestSuite) TestGetSystemLogs() {
 	suite.T().Skip() // unable to parse "Since" TODO: Check parsing query string
 	testcases := []struct {
 		Name          string
-		Query         *SystemLogsQueryOpts
+		Query         *sdk.SystemLogsQueryOpts
 		ExpectedError bool
 		StatusCode    int
 	}{
 		{
 			Name: "nodeinfo/Tail2/FollowFalse",
-			Query: &SystemLogsQueryOpts{
+			Query: &sdk.SystemLogsQueryOpts{
 				Name:   "nodeinfo",
 				Tail:   2,
 				Follow: false,
@@ -711,7 +712,7 @@ func (suite *GoFaasTestSuite) TestGetSystemLogs() {
 		},
 		{
 			Name: "nodeinfo/Tail5/Since2020-01-22T07:48:18+00:00",
-			Query: &SystemLogsQueryOpts{
+			Query: &sdk.SystemLogsQueryOpts{
 				Name:  "nodeinfo",
 				Tail:  5,
 				Since: "2020-01-22T07:48:18+00:00",
@@ -721,7 +722,7 @@ func (suite *GoFaasTestSuite) TestGetSystemLogs() {
 		},
 		{
 			Name: "InvalidFunc/Tail2/FollowFalse",
-			Query: &SystemLogsQueryOpts{
+			Query: &sdk.SystemLogsQueryOpts{
 				Name:   "InvalidFunc",
 				Tail:   2,
 				Follow: false,
@@ -767,33 +768,33 @@ func (suite *GoFaasTestSuite) TestGetHealthz() {
 
 func (suite *GoFaasTestSuite) TearDownSuite() {
 	// teardown functions
-	_, err := suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "nodeinfo123456"})
+	_, err := suite.cli.DeleteSystemFunction(&sdk.DeleteFunctionBodyOpts{FunctionName: "nodeinfo123456"})
 	if err != nil {
 		suite.T().Logf("error occurred while tearing down nodeinfo1235: %v", err)
 	}
-	_, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"})
+	_, err = suite.cli.DeleteSystemFunction(&sdk.DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"})
 	if err != nil {
 		suite.T().Logf("error occurred while tearing down yetanothernodeinfo: %v", err)
 	}
-	_, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "integration_testnodeinfo"})
+	_, err = suite.cli.DeleteSystemFunction(&sdk.DeleteFunctionBodyOpts{FunctionName: "integration_testnodeinfo"})
 	if err != nil {
 		suite.T().Logf("error occurred while tearing down integration_testnodeinfo: %v", err)
 	}
 
 	// teardown secrets
-	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey101"})
+	_, err = suite.cli.DeleteSecret(&sdk.SecretNameBodyOpts{Name: "secretkey101"})
 	if err != nil {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
 	}
-	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey102"})
+	_, err = suite.cli.DeleteSecret(&sdk.SecretNameBodyOpts{Name: "secretkey102"})
 	if err != nil {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
 	}
-	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey103"})
+	_, err = suite.cli.DeleteSecret(&sdk.SecretNameBodyOpts{Name: "secretkey103"})
 	if err != nil {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
 	}
-	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "integration_test_secret"})
+	_, err = suite.cli.DeleteSecret(&sdk.SecretNameBodyOpts{Name: "integration_test_secret"})
 	if err != nil {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
 	}
