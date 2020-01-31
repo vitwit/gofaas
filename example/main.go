@@ -18,10 +18,10 @@ func main() {
 		return
 	}
 
-	_, err = cli.GetSystemFunctions()
-	if err != nil {
-		golog.Error("Error from system functions:  ", err)
-	}
+	//_, err = cli.GetSystemFunctions()
+	//if err != nil {
+	//	golog.Error("Error from system functions:  ", err)
+	//}
 
 	data := &faas.FunctionDefintion{
 		Service: "nodeinfo",
