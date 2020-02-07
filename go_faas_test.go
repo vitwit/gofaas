@@ -766,15 +766,21 @@ func (suite *GoFaasTestSuite) TestGetHealthz() {
 }
 
 func (suite *GoFaasTestSuite) TearDownSuite() {
+	// teardown functions
 	_, err := suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "nodeinfo123456"})
 	if err != nil {
 		suite.T().Logf("error occurred while tearing down nodeinfo1235: %v", err)
-		_, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"})
-		if err != nil {
-			suite.T().Logf("error occurred while tearing down yetanothernodeinfo: %v", err)
-		}
+	}
+	_, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "yetanothernodeinfo"})
+	if err != nil {
+		suite.T().Logf("error occurred while tearing down yetanothernodeinfo: %v", err)
+	}
+	_, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: "integration_testnodeinfo"})
+	if err != nil {
+		suite.T().Logf("error occurred while tearing down integration_testnodeinfo: %v", err)
 	}
 
+	// teardown secrets
 	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey101"})
 	if err != nil {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
@@ -784,6 +790,10 @@ func (suite *GoFaasTestSuite) TearDownSuite() {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
 	}
 	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "secretkey103"})
+	if err != nil {
+		suite.T().Logf("Error tearing down secretkey101 : %v", err)
+	}
+	_, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: "integration_test_secret"})
 	if err != nil {
 		suite.T().Logf("Error tearing down secretkey101 : %v", err)
 	}
