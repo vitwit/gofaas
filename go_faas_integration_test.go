@@ -2,18 +2,20 @@
 
 package go_faas
 
-import "github.com/stretchr/testify/assert"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 	funcName := "integration_testnodeinfo"
 
 	// get functions
-	resp, err := suite.cli.GetSystemFunctions()
-	if err != nil {
-		suite.T().Fatalf("GetSystemFunctions/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 200, resp.StatusCode)
+	suite.T().Run("IntTests/TestFunctionsCRUD/GetSystemFunctions", func(t *testing.T) {
+		resp, err := suite.cli.GetSystemFunctions()
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 200, resp.StatusCode)
+	})
 
 	// create a func
 	def := &FunctionDefintion{
@@ -42,20 +44,18 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 		},
 		ReadOnlyRootFilesystem: true,
 	}
-	resp, err = suite.cli.CreateSystemFunctions(def)
-	if err != nil {
-		suite.T().Fatalf("CreateSystemFunctions/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 202, resp.StatusCode)
+	suite.T().Run("IntTests/TestFunctionsCRUD/CreateSystemFunctions", func(t *testing.T) {
+		resp, err = suite.cli.CreateSystemFunctions(def)
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 202, resp.StatusCode)
+	})
 
 	// get function summary
-	resp, err = suite.cli.GetFunctionSummary(funcName)
-	if err != nil {
-		suite.T().Fatalf("CreateSystemFunctions/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 200, resp.StatusCode)
+	suite.T().Run("IntTests/TestFunctionsCRUD/GetFunctionSummary", func(t *testing.T) {
+		resp, err = suite.cli.GetFunctionSummary(funcName)
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 200, resp.StatusCode)
+	})
 
 	// update the func
 	update := &FunctionDefintion{
@@ -66,42 +66,38 @@ func (suite *GoFaasTestSuite) TestFunctionsCRUD() {
 			CPU:    "0.01",
 		},
 	}
-	resp, err = suite.cli.UpdateSystemFunctions(update)
-	if err != nil {
-		suite.T().Fatalf("UpdateSystemFunctions/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 202, resp.StatusCode)
+	suite.T().Run("IntTests/TestFunctionsCRUD/UpdateSystemFunctions", func(t *testing.T) {
+		resp, err = suite.cli.UpdateSystemFunctions(update)
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 202, resp.StatusCode)
+	})
 
 	// scale up the func
-	resp, err = suite.cli.ScaleFunction(&ScaleFunctionBodyOpts{
-		Service:  funcName,
-		Replicas: 3,
+	suite.T().Run("IntTests/TestFunctionsCRUD/ScaleFunction/Up", func(t *testing.T) {
+		resp, err = suite.cli.ScaleFunction(&ScaleFunctionBodyOpts{
+			Service:  funcName,
+			Replicas: 3,
+		})
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 202, resp.StatusCode)
 	})
-	if err != nil {
-		suite.T().Fatalf("ScaleFunction/Up/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 202, resp.StatusCode)
 
 	// scale down the func
-	resp, err = suite.cli.ScaleFunction(&ScaleFunctionBodyOpts{
-		Service:  funcName,
-		Replicas: 1,
+	suite.T().Run("IntTests/TestFunctionsCRUD/ScaleFunction/Down", func(t *testing.T) {
+		resp, err = suite.cli.ScaleFunction(&ScaleFunctionBodyOpts{
+			Service:  funcName,
+			Replicas: 1,
+		})
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 202, resp.StatusCode)
 	})
-	if err != nil {
-		suite.T().Fatalf("ScaleFunction/Down/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 202, resp.StatusCode)
 
 	// delete the func
-	resp, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: funcName})
-	if err != nil {
-		suite.T().Fatalf("DeleteSystemFunction/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 202, resp.StatusCode)
+	suite.T().Run("IntTests/TestFunctionsCRUD/DeleteSystemFunction", func(t *testing.T) {
+		resp, err = suite.cli.DeleteSystemFunction(&DeleteFunctionBodyOpts{FunctionName: funcName})
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 202, resp.StatusCode)
+	})
 }
 
 func (suite *GoFaasTestSuite) TestSecretsCRUD() {
@@ -109,42 +105,38 @@ func (suite *GoFaasTestSuite) TestSecretsCRUD() {
 	secretVal := "integration_test_secret_val"
 
 	//get secrets list
-	resp, err := suite.cli.GetSecrets()
-	if err != nil {
-		suite.T().Errorf("GetSecrets/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), resp.StatusCode, 200)
+	suite.T().Run("IntTests/TestSecretsCRUD/GetSecrets", func(t *testing.T) {
+		resp, err := suite.cli.GetSecrets()
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), resp.StatusCode, 200)
+	})
 
 	// create new secret
-	resp, err = suite.cli.CreateNewSecret(&SecretBodyOpts{
-		Name:  secretName,
-		Value: secretVal,
+	suite.T().Run("IntTests/TestSecretsCRUD/CreateNewSecret", func(t *testing.T) {
+		resp, err = suite.cli.CreateNewSecret(&SecretBodyOpts{
+			Name:  secretName,
+			Value: secretVal,
+		})
 	})
-	if err != nil {
-		suite.T().Fatalf("CreateNewSecret/Error: %v", err)
-	}
 	assert.Equal(suite.T(), nil, err)
 	assert.Equal(suite.T(), 201, resp.StatusCode)
 
 	// update the secret if not a swarm cluster
 	if suite.cli.ClusterType != "swarm" {
-		resp, err = suite.cli.UpdateSecret(&SecretBodyOpts{
-			Name:  secretName,
-			Value: "updated_integration_test_secret_val",
+		suite.T().Run("IntTests/TestSecretsCRUD/UpdateSecret", func(t *testing.T) {
+			resp, err = suite.cli.UpdateSecret(&SecretBodyOpts{
+				Name:  secretName,
+				Value: "updated_integration_test_secret_val",
+			})
 		})
-		if err != nil {
-			suite.T().Fatalf("UpdateSecret/Error: %v", err)
-		}
 		assert.Equal(suite.T(), nil, err)
 		assert.Equal(suite.T(), 200, resp.StatusCode)
 	}
 
 	// delete the secret
-	resp, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: secretName})
-	if err != nil {
-		suite.T().Fatalf("DeleteSecret/Error: %v", err)
-	}
-	assert.Equal(suite.T(), nil, err)
-	assert.Equal(suite.T(), 200, resp.StatusCode)
+	suite.T().Run("IntTests/TestSecretsCRUD/DeleteSecret", func(t *testing.T) {
+		resp, err = suite.cli.DeleteSecret(&SecretNameBodyOpts{Name: secretName})
+		assert.Equal(suite.T(), nil, err)
+		assert.Equal(suite.T(), 200, resp.StatusCode)
+	})
 }
