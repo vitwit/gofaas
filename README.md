@@ -1,7 +1,7 @@
 
 # go-faas
 Go SDK for OpenFaaS
-This documentation is under (WIP)
+This documentation is under (Beta)
 
 **This library allows you to quickly and easily use the openFasS API**
 
