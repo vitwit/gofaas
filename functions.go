@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-// Create a system function
+// CreateSystemFunctions creates system function based on FunctionDefination. It returns a HTTPResponse when successful.
 func (cl *OpenFaasClient) CreateSystemFunctions(def *FunctionDefintion) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPost, "/system/functions")
 	request.Body = GetRequestBody(def)
