@@ -219,7 +219,7 @@ func (cl *OpenFaasClient) GetSystemInfo() (*HTTPResponse, error) {
 	return resp, nil
 }
 
-// Health Check
+// GetHealthz function does Health Check
 func (cl *OpenFaasClient) GetHealthz() (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodGet, "/healthz")
 
