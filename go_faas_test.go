@@ -1,11 +1,12 @@
-package go_faas
+package gofaas
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type GoFaasTestSuite struct {
@@ -15,7 +16,7 @@ type GoFaasTestSuite struct {
 
 func (suite *GoFaasTestSuite) SetupTest() {
 	cli, err := NewClient(&FaasGatewayCredentials{
-		Username:       os.Getenv("OPENFAAS_USERNAME"),
+		Username:       os.Getenv("OPENFAAS_USER"),
 		Password:       os.Getenv("OPENFAAS_PASSWORD"),
 		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
 		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),

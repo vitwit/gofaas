@@ -1,5 +1,5 @@
 
-# go-faas
+# gofaas
 Go SDK for OpenFaaS
 This documentation is under (Beta)
 
@@ -18,7 +18,7 @@ This documentation is under (Beta)
 ### Install Package
 
 ```sh
-	go get github.com/vitwit/go-faas
+	go get github.com/vitwit/gofaas
 ```
 
 
@@ -39,7 +39,7 @@ Update the development environment with your keys, for example:
 $ export OPENFAAS_GATEWAY_ADDR=http://127.0.0.1:8080
 $ export OPENFAAS_USER='admin'
 $ export OPENFAAS_PASSWORD='password'
-$ export OPENFAAS_CLUSTER_TYPE='swarm/kubernetes'
+$ export OPENFAAS_CLUSTER_TYPE='swarm'
 ```
 <a name="quick-start"></a>
 # Quick Start
@@ -47,10 +47,10 @@ $ export OPENFAAS_CLUSTER_TYPE='swarm/kubernetes'
 ### Create a client
 
 ```
-import faas "github.com/vitwit/go-faas";
+import faas "github.com/vitwit/gofaas"
 
 client := faas.NewClient(&faas.FaasGatewayCredentials{
-    Username:       os.Getenv("OPENFAAS_USERNAME"),
+    Username:       os.Getenv("OPENFAAS_USER"),
     Password:       os.Getenv("OPENFAAS_PASSWORD"),
     GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"),
     ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),

@@ -1,4 +1,4 @@
-package go_faas
+package gofaas
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ func (cl *OpenFaasClient) CreateSystemFunctions(def *FunctionDefintion) (*HTTPRe
 	return resp, nil
 }
 
-// Get system functions
+// GetSystemFunctions get system functions
 func (cl *OpenFaasClient) GetSystemFunctions() (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodGet, "/system/functions")
 
@@ -29,7 +29,7 @@ func (cl *OpenFaasClient) GetSystemFunctions() (*HTTPResponse, error) {
 	return resp, nil
 }
 
-// Get system functions
+// UpdateSystemFunctions will updates a system functions
 func (cl *OpenFaasClient) UpdateSystemFunctions(data *FunctionDefintion) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPut, "/system/functions")
 	request.Body = GetRequestBody(data)
@@ -41,7 +41,7 @@ func (cl *OpenFaasClient) UpdateSystemFunctions(data *FunctionDefintion) (*HTTPR
 	return resp, nil
 }
 
-// Delete a system function
+// DeleteSystemFunction will deletes a system function
 func (cl *OpenFaasClient) DeleteSystemFunction(data *DeleteFunctionBodyOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodDelete, "/system/functions")
 	b := GetByteData(*data)
@@ -54,7 +54,7 @@ func (cl *OpenFaasClient) DeleteSystemFunction(data *DeleteFunctionBodyOpts) (*H
 	return resp, nil
 }
 
-// System alert
+// SystemAlert will alert system
 func (cl *OpenFaasClient) SystemAlert(data *SystemAlertBodyOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPost, "/system/alert")
 	b := GetByteData(*data)
@@ -67,7 +67,7 @@ func (cl *OpenFaasClient) SystemAlert(data *SystemAlertBodyOpts) (*HTTPResponse,
 	return resp, nil
 }
 
-// Invoke a function asynchronously in OpenFaaS
+// AsyncFunction will invoke a function asynchronously in OpenFaaS
 func (cl *OpenFaasClient) AsyncFunction(opts *AsyncInvocationOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPost, fmt.Sprintf("/async-function/%s", opts.FunctionName))
 	if opts.Body != nil {
@@ -86,7 +86,7 @@ func (cl *OpenFaasClient) AsyncFunction(opts *AsyncInvocationOpts) (*HTTPRespons
 	return resp, nil
 }
 
-// Invoke a function defined in OpenFaaS
+// InvokeFunction will invoke a function defined in OpenFaaS
 func (cl *OpenFaasClient) InvokeFunction(opts *SyncInvocationOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPost, fmt.Sprintf("/function/%s", opts.FunctionName))
 
@@ -102,7 +102,7 @@ func (cl *OpenFaasClient) InvokeFunction(opts *SyncInvocationOpts) (*HTTPRespons
 	return resp, nil
 }
 
-// Scale a function
+// ScaleFunction will Scales a function
 func (cl *OpenFaasClient) ScaleFunction(opts *ScaleFunctionBodyOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPost, fmt.Sprintf("/system/scale-function/%s", opts.Service))
 	b := GetByteData(*opts)
@@ -115,7 +115,7 @@ func (cl *OpenFaasClient) ScaleFunction(opts *ScaleFunctionBodyOpts) (*HTTPRespo
 	return resp, nil
 }
 
-// Get a summary of an OpenFaaS function
+// GetFunctionSummary will get a summary of an OpenFaaS function
 func (cl *OpenFaasClient) GetFunctionSummary(functionName string) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodGet, fmt.Sprintf("/system/function/%s", functionName))
 
@@ -126,7 +126,7 @@ func (cl *OpenFaasClient) GetFunctionSummary(functionName string) (*HTTPResponse
 	return resp, nil
 }
 
-// Get a list of secret names and metadata from the provider
+// GetSecrets will get a list of secret names and metadata from the provider
 func (cl *OpenFaasClient) GetSecrets() (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodGet, "/system/secrets")
 
@@ -137,7 +137,7 @@ func (cl *OpenFaasClient) GetSecrets() (*HTTPResponse, error) {
 	return resp, nil
 }
 
-// Create a new secret.
+// CreateNewSecret will creates a new secret.
 func (cl *OpenFaasClient) CreateNewSecret(data *SecretBodyOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodPost, "/system/secrets")
 	if data.Name != "" {
@@ -152,7 +152,7 @@ func (cl *OpenFaasClient) CreateNewSecret(data *SecretBodyOpts) (*HTTPResponse, 
 	return resp, nil
 }
 
-// Update a secret.
+// UpdateSecret  will updates a secret.
 func (cl *OpenFaasClient) UpdateSecret(data *SecretBodyOpts) (*HTTPResponse, error) {
 	if cl.ClusterType == "swarm" {
 		return &HTTPResponse{}, fmt.Errorf("cannot update secret for swarm cluster")
@@ -169,7 +169,7 @@ func (cl *OpenFaasClient) UpdateSecret(data *SecretBodyOpts) (*HTTPResponse, err
 	return resp, nil
 }
 
-// Remove a secret.
+// DeleteSecret will removes a secret.
 func (cl *OpenFaasClient) DeleteSecret(data *SecretNameBodyOpts) (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodDelete, "/system/secrets")
 	b := GetByteData(*data)
@@ -182,7 +182,7 @@ func (cl *OpenFaasClient) DeleteSecret(data *SecretNameBodyOpts) (*HTTPResponse,
 	return resp, nil
 }
 
-// Get a stream of the logs for a specific function
+// GetSystemLogs will get a stream of the logs for a specific function
 func (cl *OpenFaasClient) GetSystemLogs(opts *SystemLogsQueryOpts) (*HTTPResponse, error) {
 	path := fmt.Sprintf("/system/logs?name=%s", opts.Name)
 	if opts.Since != "" {
@@ -208,7 +208,7 @@ func (cl *OpenFaasClient) GetSystemLogs(opts *SystemLogsQueryOpts) (*HTTPRespons
 	return resp, nil
 }
 
-// Get info such as provider version number and provider orchestrator
+// GetSystemInfo will gets info such as provider version number and provider orchestrator
 func (cl *OpenFaasClient) GetSystemInfo() (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodGet, "/system/info")
 
@@ -219,7 +219,7 @@ func (cl *OpenFaasClient) GetSystemInfo() (*HTTPResponse, error) {
 	return resp, nil
 }
 
-// Health Check
+// GetHealthz function does Health Check
 func (cl *OpenFaasClient) GetHealthz() (*HTTPResponse, error) {
 	request := GetRequestDefinition(cl, http.MethodGet, "/healthz")
 

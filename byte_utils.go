@@ -1,4 +1,4 @@
-package go_faas
+package gofaas
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ func GetRequestBody(data *FunctionDefintion) []byte {
 	return b
 }
 
-// Returns the bytes of an interface
+// GetByteData will returns the bytes of an interface
 func GetByteData(data interface{}) []byte {
 	b, err := json.Marshal(data)
 	if err != nil {
