@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/kataras/golog"
-	faas "github.com/vitwit/go-faas"
 	"os"
+
+	"github.com/kataras/golog"
+	faas "github.com/vitwit/gofaas"
 )
 
 func main() {

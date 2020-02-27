@@ -1,5 +1,5 @@
 
-# go-faas
+# gofaas
 Go SDK for OpenFaaS
 This documentation is under (Beta)
 
@@ -18,7 +18,7 @@ This documentation is under (Beta)
 ### Install Package
 
 ```sh
-	go get github.com/vitwit/go-faas
+	go get github.com/vitwit/gofaas
 ```
 
 
@@ -47,7 +47,7 @@ $ export OPENFAAS_CLUSTER_TYPE='swarm/kubernetes'
 ### Create a client
 
 ```
-import faas "github.com/vitwit/go-faas";
+import faas "github.com/vitwit/gofaas"
 
 client := faas.NewClient(&faas.FaasGatewayCredentials{
     Username:       os.Getenv("OPENFAAS_USERNAME"),
