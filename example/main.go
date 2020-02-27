@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/kataras/golog"
@@ -15,17 +14,10 @@ func main() {
 		GatewayAddress: os.Getenv("OPENFAAS_GATEWAY_ADDR"), // example: http://127.0.0.1:8080
 		ClusterType:    os.Getenv("OPENFAAS_CLUSTER_TYPE"),
 	})
-
-	fmt.Println("client ", cli)
 	if err != nil {
 		golog.Error(err)
 		return
 	}
-
-	//_, err = cli.GetSystemFunctions()
-	//if err != nil {
-	//	golog.Error("Error from system functions:  ", err)
-	//}
 
 	createData := &gofaas.FunctionDefintion{
 		Service:    "nodeinfo",
@@ -59,10 +51,7 @@ func main() {
 		ReadOnlyRootFilesystem: true,
 	}
 	createResp, createErr := cli.CreateSystemFunctions(createData)
-	// if createErr != nil {
-	// golog.Error("error while calling %s/system/functions: %v", cli.GatewayAddress, createErr)
-	// }
-	fmt.Println("create response==> ", createResp, createErr)
+	golog.Info(createResp, createErr)
 
 	data := &gofaas.FunctionDefintion{
 		Service: "nodeinfo",
@@ -75,29 +64,20 @@ func main() {
 	if updateErr != nil {
 		golog.Error("Error while creating system:  ", updateErr)
 	}
-	fmt.Println("UpdateSystemFunctions resp ==> ", resp, updateErr)
+	golog.Info(resp, updateErr)
 
 	res, summaryErr := cli.GetFunctionSummary("nodeinfo")
-	// if summaryErr != nil {
-	// golog.Error("error while getting summary for func %s: %v", "nodeinfo", summaryErr)
-	// }
-	fmt.Println("GetFunctionSummary==> ", res, summaryErr)
+	golog.Info(res, summaryErr)
 
 	response, invokeErr := cli.InvokeFunction(&gofaas.SyncInvocationOpts{
 		Body:         "Testing func_nodeinfo",
 		FunctionName: "nodeinfo",
 	})
-	// if invokeErr != nil {
-	// golog.Error("error while invoking func %s: %v", "nodeinfo", invokeErr)
-	// }
-	fmt.Println("InvokeFunction resp==> ", response, invokeErr)
+	golog.Info(response, invokeErr)
 
 	response1, scaleErr := cli.ScaleFunction(&gofaas.ScaleFunctionBodyOpts{
 		Service:  "nodeinfo",
 		Replicas: 1,
 	})
-	// if scaleErr != nil {
-	// golog.Error("error while scaling func %s: %v", "nodeinfo", scaleErr)
-	// }
-	fmt.Println("ScaleFunction resp==> ", response1, scaleErr)
+	golog.Info(response1, scaleErr)
 }
