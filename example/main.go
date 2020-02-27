@@ -59,9 +59,9 @@ func main() {
 		ReadOnlyRootFilesystem: true,
 	}
 	createResp, createErr := cli.CreateSystemFunctions(createData)
-	if createErr != nil {
-		// golog.Error("error while calling %s/system/functions: %v", cli.GatewayAddress, createErr)
-	}
+	// if createErr != nil {
+	// golog.Error("error while calling %s/system/functions: %v", cli.GatewayAddress, createErr)
+	// }
 	fmt.Println("create response==> ", createResp, createErr)
 
 	data := &gofaas.FunctionDefintion{
@@ -78,26 +78,26 @@ func main() {
 	fmt.Println("UpdateSystemFunctions resp ==> ", resp, updateErr)
 
 	res, summaryErr := cli.GetFunctionSummary("nodeinfo")
-	if summaryErr != nil {
-		// golog.Error("error while getting summary for func %s: %v", "nodeinfo", summaryErr)
-	}
+	// if summaryErr != nil {
+	// golog.Error("error while getting summary for func %s: %v", "nodeinfo", summaryErr)
+	// }
 	fmt.Println("GetFunctionSummary==> ", res, summaryErr)
 
 	response, invokeErr := cli.InvokeFunction(&gofaas.SyncInvocationOpts{
 		Body:         "Testing func_nodeinfo",
 		FunctionName: "nodeinfo",
 	})
-	if invokeErr != nil {
-		// golog.Error("error while invoking func %s: %v", "nodeinfo", invokeErr)
-	}
+	// if invokeErr != nil {
+	// golog.Error("error while invoking func %s: %v", "nodeinfo", invokeErr)
+	// }
 	fmt.Println("InvokeFunction resp==> ", response, invokeErr)
 
 	response1, scaleErr := cli.ScaleFunction(&gofaas.ScaleFunctionBodyOpts{
 		Service:  "nodeinfo",
 		Replicas: 1,
 	})
-	if scaleErr != nil {
-		// golog.Error("error while scaling func %s: %v", "nodeinfo", scaleErr)
-	}
+	// if scaleErr != nil {
+	// golog.Error("error while scaling func %s: %v", "nodeinfo", scaleErr)
+	// }
 	fmt.Println("ScaleFunction resp==> ", response1, scaleErr)
 }
