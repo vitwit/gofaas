@@ -1,4 +1,4 @@
-package go_faas
+package gofaas
 
 import (
 	"bytes"
@@ -7,12 +7,12 @@ import (
 	"net/url"
 )
 
-type DefaultClient struct {
+type defaultClient struct {
 	HTTPClient *http.Client
 }
 
-func (dc *DefaultClient) New() *DefaultClient {
-	return &DefaultClient{HTTPClient: http.DefaultClient}
+func (dc *defaultClient) new() *defaultClient {
+	return &defaultClient{HTTPClient: http.DefaultClient}
 }
 
 // AddQueryParameters adds query parameters to the URL.
@@ -24,7 +24,7 @@ func (cl *OpenFaasClient) AddQueryParameters(req *http.Request, queryParams Quer
 	req.URL.RawQuery = params.Encode()
 }
 
-// BuildRequestObject creates the HTTP request object.
+// BuildHTTPRequest creates the HTTP request object.
 func (cl *OpenFaasClient) BuildHTTPRequest(reqDef *FaasRequestDefinition) (*http.Request, error) {
 	// make new request
 	req, err := http.NewRequest(reqDef.Method, reqDef.URL, bytes.NewBuffer(reqDef.Body))
@@ -50,7 +50,7 @@ func (cl *OpenFaasClient) BuildHTTPRequest(reqDef *FaasRequestDefinition) (*http
 	return req, nil
 }
 
-// BuildResponse builds the response struct.
+// BuildSuccessResponse will builds the response struct.
 func (cl *OpenFaasClient) BuildSuccessResponse(res *http.Response) (*HTTPResponse, error) {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -65,16 +65,16 @@ func (cl *OpenFaasClient) BuildSuccessResponse(res *http.Response) (*HTTPRespons
 	return response, nil
 }
 
-// Send the http req and return response
+// SendHTTPRequest will send the http req and return http response
 func (cl *OpenFaasClient) SendHTTPRequest(req *FaasRequestDefinition) (*HTTPResponse, error) {
 	httpReq, err := cl.BuildHTTPRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
-	var dc DefaultClient
-	defaultClient := dc.New()
-	resp, err := defaultClient.HTTPClient.Do(httpReq)
+	var dc defaultClient
+	newDefaultClient := dc.new()
+	resp, err := newDefaultClient.HTTPClient.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}

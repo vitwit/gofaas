@@ -1,4 +1,4 @@
-package go_faas
+package gofaas
 
 import (
 	"encoding/base64"

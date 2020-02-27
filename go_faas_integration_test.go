@@ -1,6 +1,6 @@
 // +build integration
 
-package go_faas
+package gofaas
 
 import (
 	"github.com/stretchr/testify/assert"
