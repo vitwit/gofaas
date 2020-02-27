@@ -50,9 +50,9 @@ func main() {
 		},
 		ReadOnlyRootFilesystem: true,
 	}
-	_, createErr := cli.CreateSystemFunctions(createData)
-	if createErr != nil {
-		golog.Error("Error in CreateSystemFunctions ", createErr)
+	_, err = cli.CreateSystemFunctions(createData)
+	if err != nil {
+		golog.Error("Error in CreateSystemFunctions ", err)
 	}
 
 	data := &gofaas.FunctionDefintion{
@@ -62,29 +62,29 @@ func main() {
 			"changedlabelkey": "changedlabelval",
 		},
 	}
-	_, updateErr := cli.UpdateSystemFunctions(data)
-	if updateErr != nil {
-		golog.Error("Error while creating system:  ", updateErr)
+	_, err = cli.UpdateSystemFunctions(data)
+	if err != nil {
+		golog.Error("Error while creating system:  ", err)
 	}
 
-	_, summaryErr := cli.GetFunctionSummary("nodeinfo")
-	if summaryErr != nil {
-		golog.Error("Error in GetFunctionSummary ", summaryErr)
+	_, err = cli.GetFunctionSummary("nodeinfo")
+	if err != nil {
+		golog.Error("Error in GetFunctionSummary ", err)
 	}
 
-	_, invokeErr := cli.InvokeFunction(&gofaas.SyncInvocationOpts{
+	_, err = cli.InvokeFunction(&gofaas.SyncInvocationOpts{
 		Body:         "Testing func_nodeinfo",
 		FunctionName: "nodeinfo",
 	})
-	if invokeErr != nil {
-		golog.Error("Error in InvokeFunction ", invokeErr)
+	if err != nil {
+		golog.Error("Error in InvokeFunction ", err)
 	}
 
-	_, scaleErr := cli.ScaleFunction(&gofaas.ScaleFunctionBodyOpts{
+	_, err = cli.ScaleFunction(&gofaas.ScaleFunctionBodyOpts{
 		Service:  "nodeinfo",
 		Replicas: 1,
 	})
-	if scaleErr != nil {
-		golog.Error("Error in ScaleFunction ", scaleErr)
+	if err != nil {
+		golog.Error("Error in ScaleFunction ", err)
 	}
 }
