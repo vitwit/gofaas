@@ -7,12 +7,13 @@ import (
 	"net/url"
 )
 
-type defaultClient struct {
+// DefaultClient defines default client
+type DefaultClient struct {
 	HTTPClient *http.Client
 }
 
-func (dc *defaultClient) new() *defaultClient {
-	return &defaultClient{HTTPClient: http.DefaultClient}
+func (dc *DefaultClient) new() *DefaultClient {
+	return &DefaultClient{HTTPClient: http.DefaultClient}
 }
 
 // AddQueryParameters adds query parameters to the URL.
@@ -72,7 +73,7 @@ func (cl *OpenFaasClient) SendHTTPRequest(req *FaasRequestDefinition) (*HTTPResp
 		return nil, err
 	}
 
-	var dc defaultClient
+	var dc DefaultClient
 	newDefaultClient := dc.new()
 	resp, err := newDefaultClient.HTTPClient.Do(httpReq)
 	if err != nil {

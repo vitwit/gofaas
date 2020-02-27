@@ -15,8 +15,8 @@ func GetRequestDefinition(cli *OpenFaasClient, method, path string) *FaasRequest
 	return &cli.FaasRequestDefinition
 }
 
-// getGatewayAddress will return gateway address
-func getGatewayAddress(gateway string) string {
+// GetGatewayAddress will return gateway address
+func GetGatewayAddress(gateway string) string {
 	if gateway == "" {
 		gateway = os.Getenv("OPENFAAS_GATEWAY_ADDR")
 	}
@@ -38,7 +38,7 @@ func setClientRequestOpts(creds *FaasGatewayCredentials) FaasRequestDefinition {
 	}
 
 	return FaasRequestDefinition{
-		GatewayAddress: getGatewayAddress(creds.GatewayAddress),
+		GatewayAddress: GetGatewayAddress(creds.GatewayAddress),
 		Headers:        requestHeaders,
 		ClusterType:    creds.ClusterType,
 	}
